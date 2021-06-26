@@ -1,12 +1,12 @@
 ## AxProf Package
 
-Run from `AxProf` base directory.
+Run from this `AxProf` directory.
 
 ```bash
 $ pip3 install -e .
 ```
 
-To run the `hyperloglog` example. From the `examples` folder in `Axprof` (base).
+To run the `hyperloglog (hll)` example, run these commands from the `examples` folder in `Axprof` (base).
 
 ```bash
 
