@@ -1,0 +1,3 @@
+[submodule "examples/datasketch"]
+	path = examples/datasketch
+	url = https://github.com/ekzhu/datasketch

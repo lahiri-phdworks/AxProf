@@ -5,6 +5,7 @@
 # Please follow instructions for downloading the datasketch library in the
 # 'Example' section of README.md in the root directory of this repository.
 
+
 import sys
 import time
 import pickle
@@ -13,27 +14,30 @@ from numpy import sqrt
 
 sys.path.append('../AxProf')
 import AxProf
-
 sys.path.append('./datasketch')
 
 try:
-  from datasketch import hyperloglog
+    from datasketch import hyperloglog
 except ModuleNotFoundError:
-  print(
-"""
+    print(
+        """
 Error: datasketch library not found!
 Please follow instructions for downloading the datasketch library in the
 'Example' section of README.md in the root directory of this repository.
 """)
-  exit(-1)
-  
+    exit(-1)
+
+
+# configlist = {'k': [8, 10, 12, 14],
+#               'datasize': range(10000, 110000, 10000)}
 
 configlist = {'k': [8, 10, 12, 14],
-              'datasize': range(10000, 110000, 10000)}
+              'datasize': range(10)}
 
 
 def input_params(config, inputNum):
     return config['datasize'], 0, 1000000
+
 
 spec = '''
 Input list of real;
@@ -44,6 +48,7 @@ TIME k*datasize;
 SPACE 2^k;
 ACC Probability over inputs[ abs(datasize-Output) < (datasize*1.04)/sqrt(2^k) ] > 0.65
 '''
+
 
 def runner(ifname, config):
     h = hyperloglog.HyperLogLog(p=int(config['k']))
@@ -75,9 +80,9 @@ def runner(ifname, config):
 
 
 if __name__ == "__main__":
-  subprocess.run(['date'])
-  AxProf.checkProperties(configlist, 1, None,
-                         AxProf.distinctIntegerGenerator,
-                         input_params, runner, spec=spec)
-  subprocess.run(['date'])
-  subprocess.run(args=['rm', '-f', '_AXPROF_MEMDUMP'])
+    subprocess.run(['date'])
+    AxProf.checkProperties(configlist, 1, None,
+                           AxProf.distinctIntegerGenerator,
+                           input_params, runner, spec=spec)
+    subprocess.run(['date'])
+    subprocess.run(args=['rm', '-f', '_AXPROF_MEMDUMP'])
