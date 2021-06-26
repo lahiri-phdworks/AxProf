@@ -19,17 +19,17 @@ import java.nio.file.Paths;
 */
 
 public class MainClass {
-  public static void main(String args[]) throws Exception{
-    if(args.length < 1) {
+  public static void main(String args[]) throws Exception {
+    if (args.length < 1) {
       System.err.println("Error: No spec file given.");
       System.exit(1);
     }
     String filename = args[0];
-    CharStream inStream=null;
-    try{
+    CharStream inStream = null;
+    try {
       inStream = CharStreams.fromStream(new FileInputStream(filename));
-    }catch(Exception e){
-      System.err.println("Could not read file "+filename);
+    } catch (Exception e) {
+      System.err.println("Could not read file " + filename);
       return;
     }
     AxProfSpecLexer lexer = new AxProfSpecLexer(inStream);
@@ -37,9 +37,9 @@ public class MainClass {
     tokens.fill();
     AxProfSpecParser parser = new AxProfSpecParser(tokens);
     AxProfSpecParser.SpecContext spec = null;
-    try{
+    try {
       spec = parser.spec();
-    }catch(Exception e){
+    } catch (Exception e) {
       e.printStackTrace();
     }
     Semantic semantic = new Semantic(spec.value);

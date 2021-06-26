@@ -30,7 +30,7 @@ Please follow instructions for downloading the datasketch library in the
 #               'datasize': range(10000, 110000, 10000)}
 
 configlist = {'k': [8, 10, 12, 14],
-              'datasize': range(10)}
+              'datasize': range(100)}
 
 
 def input_params(config, inputNum):
