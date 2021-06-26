@@ -1,0 +1,23 @@
+Metadata-Version: 2.1
+Name: AxProf
+Version: 0.0.1
+Summary: AxProf Package
+Home-page: https://axprof.org/
+Author: Keyur Joshi et al
+Author-email: kpjoshi2@illinois.edu
+License: UNKNOWN
+Project-URL: Bug Tracker, https://github.com/uiuc-arc/AxProf/issues
+Description: ## AxProf Package
+        
+        Run from `AxProf` base directory.
+        
+        ```bash
+        $ pip3 install -e .
+        ```
+        
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: Apache License 2.0
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown

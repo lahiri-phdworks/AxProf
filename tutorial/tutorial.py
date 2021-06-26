@@ -13,6 +13,7 @@
 # Some Python modules required for this tutorial. You might need others for your
 # test script.
 
+import AxProf
 import random
 import sys
 import time
@@ -24,7 +25,6 @@ import time
 # variable of your system.
 
 sys.path.append('../AxProf')
-import AxProf
 
 # ==============================================================================
 
@@ -37,7 +37,7 @@ import AxProf
 # AxProf will test a total of four configurations:
 # [{A:1,B:3},{A:1,B:4},{A:2,B:3},{A:2,B:4}]
 
-configList = {'coins':[10,100,1000]}
+configList = {'coins': [10, 100, 1000]}
 
 # ==============================================================================
 
@@ -50,7 +50,7 @@ configList = {'coins':[10,100,1000]}
 # be declared. The return type of any external functions used must also be
 # declared.
 
-spec='''
+spec = '''
 Input list of real;
 Output real;
 TIME coins;
@@ -83,8 +83,9 @@ ACC Expectation over runs [Output] == coins/2
 # integer value, and the maximum integer value. The full list of generators is
 # available in AxProf/AxProfGenerators.py in the artifact.
 
+
 def inputParams(config, inputNum):
-  return [config['coins'], 0, 1000000]
+    return [config['coins'], 0, 1000000]
 
 # This tells AxProf's distinctIntegerGenerator to generate distinct integers
 # between 0 and 1000000. The number of integers generated is equal to the number
@@ -101,24 +102,25 @@ def inputParams(config, inputNum):
 # the amount of time consumed, and the amount of memory used. The task of time
 # and memory usage measurement is left to the runner.
 
+
 def runner(inputFileName, config):
-  startTime = time.time() # Start measuring time
-  coinSum = flipCoins(config['coins'])
-  endTime = time.time() # Stop measuring time
-  # Prepare result; we don't measure memory but must specify it, so set it to 0
-  result = {'acc': coinSum, 'time': (endTime-startTime), 'space': 0}
-  return result
+    startTime = time.time()  # Start measuring time
+    coinSum = flipCoins(config['coins'])
+    endTime = time.time()  # Stop measuring time
+    # Prepare result; we don't measure memory but must specify it, so set it to 0
+    result = {'acc': coinSum, 'time': (endTime-startTime), 'space': 0}
+    return result
 
 
 def flipCoins(numCoins):
-  random.seed() # Seed RNG
-  coinSum = 0
-  for i in range(numCoins):
-    # Randomly pick 0 or 1 and add it to the sum
-    # Adding more 0s or 1s will skew the results to simulate an unfair coin
-    # AxProf should be able to detect this skew (unless it is small)
-    coinSum += random.choice([0,1])
-  return coinSum
+    random.seed()  # Seed RNG
+    coinSum = 0
+    for i in range(numCoins):
+        # Randomly pick 0 or 1 and add it to the sum
+        # Adding more 0s or 1s will skew the results to simulate an unfair coin
+        # AxProf should be able to detect this skew (unless it is small)
+        coinSum += random.choice([0, 1])
+    return coinSum
 
 # The flipCoins function flips the coins, adds their face values, measures the
 # time taken to do so, and returns the output. In this simple case, this
@@ -144,12 +146,13 @@ def flipCoins(numCoins):
 # It is important to use `if __name__ == '__main__':` when invoking AxProf. We
 # also measure the total time taken to use AxProf.
 
+
 if __name__ == '__main__':
-  startTime = time.time() # Start measuring time
-  AxProf.checkProperties(configList, None, 1, AxProf.distinctIntegerGenerator,
-                         inputParams, runner, spec=spec)
-  endTime = time.time() # Stop measuring time
-  print('Total time required for checking:',endTime-startTime,'seconds.')
+    startTime = time.time()  # Start measuring time
+    AxProf.checkProperties(configList, None, 1, AxProf.distinctIntegerGenerator,
+                           inputParams, runner, spec=spec)
+    endTime = time.time()  # Stop measuring time
+    print('Total time required for checking:', endTime-startTime, 'seconds.')
 
 # ==============================================================================
 

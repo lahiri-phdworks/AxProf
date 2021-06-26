@@ -10,11 +10,9 @@ import sys
 import time
 import pickle
 import subprocess
+import AxProf
 from numpy import sqrt
 
-sys.path.append('../AxProf')
-import AxProf
-sys.path.append('./datasketch')
 
 try:
     from datasketch import hyperloglog
