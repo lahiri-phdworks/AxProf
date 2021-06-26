@@ -32,6 +32,9 @@ Please follow instructions for downloading the datasketch library in the
 configlist = {'k': [8, 10, 12, 14],
               'datasize': range(100)}
 
+# How many samples to generate? config['datasize'][val]
+# Between what range to generate (0, 1000000)
+
 
 def input_params(config, inputNum):
     return config['datasize'], 0, 1000000
