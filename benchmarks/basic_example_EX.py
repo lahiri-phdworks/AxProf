@@ -14,9 +14,9 @@ from scipy.stats import bernoulli
 # coins : n -> this is a ForAll Variable.
 # prob : p -> ForAll Variable
 # y : addendum if flip is 1, ForAll Variable
-configList = {'coins': [500, 1500, 2500, 5000, 10000],
+configList = {'coins': [500, 1500, 2500, 5000],
               'prob': [0.01, 0.09, 0.10, 0.20, 0.25, 0.375, 0.50, 0.67, 0.75, 0.85, 0.90],
-              'y': [5, 10, 20, 30, 50, 85, 96, 1105, 5]}
+              'y': [5, 10, 20, 30, 50, 85, 96, 100]}
 
 # ==============================================================================
 
@@ -142,7 +142,7 @@ if __name__ == '__main__':
 
     configList contains the ForAlls.
     """
-    AxProf.checkProperties(configList, 100, 1, AxProf.distinctIntegerGenerator,
+    AxProf.checkProperties(configList, 50, 1, AxProf.distinctIntegerGenerator,
                            inputParams, runner, spec=spec)
     endTime = time.time()  # Stop measuring time
     print(f'Total time required for checking : {endTime - startTime} seconds.')
