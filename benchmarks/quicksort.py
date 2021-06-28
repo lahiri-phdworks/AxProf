@@ -8,7 +8,7 @@ from scipy.stats import bernoulli
 
 
 # n : Array Size ForAll Variable.
-configList = {'n': [1, 2, 3, 4, 5, 6, 7, 8]}
+configList = {'n': [2, 3, 4, 5, 6, 7, 8]}
 
 # Axprof Specification for QuickSort Algorithm.
 spec = '''
@@ -18,6 +18,9 @@ n real;
 TIME n;
 ACC Expectation over runs [Output] == ???
 '''
+
+random_runs = 1
+random_input_samples = 1
 
 
 def inputParams(config, inputNum):
@@ -52,9 +55,10 @@ if __name__ == '__main__':
 
     configList contains the ForAlls.
     """
-    AxProf.checkProperties(configList, 50, 1, AxProf.distinctIntegerGenerator,
+    AxProf.checkProperties(configList, random_runs, random_input_samples, AxProf.distinctIntegerGenerator,
                            inputParams, runner, spec=spec)
     endTime = time.time()  # Stop measuring time
     print(f'Total time required for checking : {endTime - startTime} seconds.')
+
 
 # ==============================================================================

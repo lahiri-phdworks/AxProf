@@ -15,14 +15,19 @@ configList = {'truth': [0, 1],
 # Axprof Specification for Monty Hall
 spec = '''
 Input list of real;
+Output real;
 truth real;
 first_flip real;
 second_flip real;
-ACC Expectation over runs [Output] == ???
+ACC Probability over runs [ Output == truth ] > 0.5
 '''
+
+random_runs = 1
+random_input_samples = 1
 
 
 def inputParams(config, inputNum):
+    # Randomly choose the second flip from AxProf.
     return [config['second_flip'], 0, 1]
 
 
@@ -33,14 +38,24 @@ def runner(inputFileName, config):
     for line in open(inputFileName, "r"):
         data.append(line[:-1])
 
-    output = randomized_response_runner(config['n'], data)
+    output = randomized_response_runner(data[0], data[1], data[2])
 
     endTime = time.time()
-    result = {'acc': output, 'time': (endTime - startTime), 'space': 0}
+    result = {'acc': output, 'time': (
+        endTime - startTime), 'space': 0, 'random input': data}
+
+    print(result)
     return result
 
 
-def randomized_response_runner():
+def randomized_response_runner(truth, first_flip, second_flip):
+    if first_flip == 0:
+        ret = truth
+    else:
+        if second_flip == 1:
+            ret = 1
+        else:
+            ret = 0
     pass
 
 
@@ -54,7 +69,7 @@ if __name__ == '__main__':
 
     configList contains the ForAlls.
     """
-    AxProf.checkProperties(configList, 50, 1, AxProf.distinctIntegerGenerator,
+    AxProf.checkProperties(configList, random_runs, random_input_samples, AxProf.distinctIntegerGenerator,
                            inputParams, runner, spec=spec)
     endTime = time.time()  # Stop measuring time
     print(f'Total time required for checking : {endTime - startTime} seconds.')

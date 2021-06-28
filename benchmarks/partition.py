@@ -8,7 +8,7 @@ from scipy.stats import bernoulli
 
 
 # n : Array Size ForAll Variable.
-configList = {'n': [1, 2, 3, 4, 5, 6, 7, 8]}
+configList = {'n': [2, 3, 4, 5, 6, 7, 8], 'r': [1]}
 
 # Axprof Specification for QuickSort Partitioning Algorithm.
 spec = '''
@@ -16,12 +16,15 @@ Input list of real;
 Output real;
 n real;
 TIME n;
-ACC Expectation over runs [Output] == ???
+ACC Expectation over runs [Output] == n/2
 '''
+
+random_runs = 1
+random_input_samples = 1
 
 
 def inputParams(config, inputNum):
-    return [config['n'], 1, 100000]
+    return [config['r'], 0, config['n']]
 
 
 def runner(inputFileName, config):
@@ -38,8 +41,25 @@ def runner(inputFileName, config):
     return result
 
 
-def partition_runner():
-    pass
+def partition_runner(arr, index):
+    left_count = 0
+    right_count = 0
+
+    pivot = arr[index]
+
+    for j in arr:
+        if j < pivot:
+            left_count += 1
+        else:
+            right_count += 1
+
+    if left_count < (right_count - 1):
+        outcome = (right_count - 1)
+    else:
+        outcome = left_count
+
+    # We need E[outcome]
+    return outcome
 
 
 if __name__ == '__main__':
@@ -52,7 +72,7 @@ if __name__ == '__main__':
 
     configList contains the ForAlls.
     """
-    AxProf.checkProperties(configList, 50, 1, AxProf.distinctIntegerGenerator,
+    AxProf.checkProperties(configList, random_runs, random_input_samples, AxProf.distinctIntegerGenerator,
                            inputParams, runner, spec=spec)
     endTime = time.time()  # Stop measuring time
     print(f'Total time required for checking : {endTime - startTime} seconds.')

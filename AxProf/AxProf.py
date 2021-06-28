@@ -182,7 +182,7 @@ def checkProperties(configDict, runs, inputs, inputGen, inputGenParams, runner,
         print("Running test program for configuration", thisConfigDict)
 
         for input_num in range(inputs):
-            print("Input", input_num + 1)
+            print("Random Input", input_num + 1)
             inpAggregate = None
             configIGParams = inputGenParams(thisConfigDict, input_num)
             inputData = inputGen(*configIGParams)

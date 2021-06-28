@@ -36,6 +36,11 @@ TIME coins;
 ACC Probability over inputs [ Output < 0.4 * coins * y ] <= 0.45  
 '''
 
+
+random_runs = 1
+random_input_samples = 1
+
+
 # y -> ForAll Variable
 # ACC Expectation over runs [Output] == coins * prob * y
 # The generator takes 3 parameters: the number of integers to generate, the minimum
@@ -141,7 +146,7 @@ if __name__ == '__main__':
 
     configList contains the ForAlls.
     """
-    AxProf.checkProperties(configList, 50, 1, AxProf.distinctIntegerGenerator,
+    AxProf.checkProperties(configList, random_runs, random_input_samples, AxProf.distinctIntegerGenerator,
                            inputParams, runner, spec=spec)
     endTime = time.time()  # Stop measuring time
     print(f'Total time required for checking : {endTime - startTime} seconds.')

@@ -7,20 +7,24 @@ import time
 from scipy.stats import bernoulli
 
 
-# choice : ForAll Variable.
-# door_switch : ForAll Variable
-configList = {'choice': [1, 2, 3],
-              'door_switch': [0, 1], 'car_door': [1]}
+# n : ForAll Variable.
+# subset_max : ForAll Variable
+configList = {'n': [2, 3, 4, 5],
+              'subset_max': [11]}
 
 # Axprof Specification for Monty Hall
 spec = '''
 Input list of real;
 Output real;
-prob real;
-y real;
-TIME coins;
-ACC Expectation over runs [Output] == coins * prob * y
+n real;
+subset_max real;
+TIME n;
+ACC Probability over runs [ Output != 0 ] >= n / subset_max
 '''
+
+
+random_runs = 1
+random_input_samples = 1
 
 
 def inputParams(config, inputNum):
@@ -37,12 +41,22 @@ def runner(inputFileName, config):
     output = schwartz_zippel_runner(config['n'], data)
 
     endTime = time.time()
-    result = {'acc': output, 'time': (endTime - startTime), 'space': 0}
+    result = {'acc': output, 'time': (
+        endTime - startTime), 'space': 0, 'random input': data}
+
+    print(result)
     return result
 
 
-def schwartz_zippel_runner():
-    pass
+def schwartz_zippel_runner(poly, r, d):
+    total = 0
+
+    # This was value intialized in the main function.
+    d = [1] * len(poly)
+    for index, item in enumerate(poly):
+        total += item * (r[index] ** d[index])
+
+    return total == 0
 
 
 if __name__ == '__main__':
@@ -55,7 +69,7 @@ if __name__ == '__main__':
 
     configList contains the ForAlls.
     """
-    AxProf.checkProperties(configList, 50, 1, AxProf.distinctIntegerGenerator,
+    AxProf.checkProperties(configList, random_runs, random_input_samples, AxProf.distinctIntegerGenerator,
                            inputParams, runner, spec=spec)
     endTime = time.time()  # Stop measuring time
     print(f'Total time required for checking : {endTime - startTime} seconds.')
