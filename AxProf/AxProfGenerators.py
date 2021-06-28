@@ -21,7 +21,13 @@ def uniformGenerator(length, _min, _max, seed=None):
     return [random.uniform(_min, _max) for _ in range(length)]
 
 
+# Generates a random uniform array of 0's and 1's
+def binaryVectorGenerator(length, runs):
+    return [random.choice([0, 1]) for i in range(length)]
+
 # Samples WITHOUT REPLACEMENT integers within [_min,_max]
+
+
 def distinctIntegerGenerator(length, _min, _max, seed=None):
     random.seed(seed)
     return random.sample(range(_min, _max+1), length)

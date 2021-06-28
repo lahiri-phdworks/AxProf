@@ -27,8 +27,18 @@ def inputParams(config, inputNum):
     return [config['car_door'], 1, 3]
 
 
-def runner():
-    pass
+def runner(inputFileName, config):
+    startTime = time.time()
+
+    data = []
+    for line in open(inputFileName, "r"):
+        data.append(line[:-1])
+
+    output = monty_hall_runner(config['n'], data)
+
+    endTime = time.time()
+    result = {'acc': output, 'time': (endTime - startTime), 'space': 0}
+    return result
 
 
 def monty_hall_runner():

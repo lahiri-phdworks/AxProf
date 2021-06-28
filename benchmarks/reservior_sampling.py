@@ -9,8 +9,8 @@ from scipy.stats import bernoulli
 
 # choice : ForAll Variable.
 # door_switch : ForAll Variable
-configList = {'choice': [1, 2, 3],
-              'door_switch': [0, 1], 'car_door': [1]}
+configList = {'n': [2, 3, 4, 5, 6, 7, 8, 9],
+              'k': [2, 3, 4, 5, 6, 7, 8, 9, 10]}
 
 # Axprof Specification for Monty Hall
 spec = '''
@@ -27,8 +27,18 @@ def inputParams(config, inputNum):
     return [config['coins'], 1, 3]
 
 
-def runner():
-    pass
+def runner(inputFileName, config):
+    startTime = time.time()
+
+    data = []
+    for line in open(inputFileName, "r"):
+        data.append(line[:-1])
+
+    output = reservoir_sampling_runner(config['n'], data)
+
+    endTime = time.time()
+    result = {'acc': output, 'time': (endTime - startTime), 'space': 0}
+    return result
 
 
 def reservoir_sampling_runner():

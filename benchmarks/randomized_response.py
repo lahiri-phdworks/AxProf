@@ -26,8 +26,18 @@ def inputParams(config, inputNum):
     return [config['second_flip'], 0, 1]
 
 
-def runner():
-    pass
+def runner(inputFileName, config):
+    startTime = time.time()
+
+    data = []
+    for line in open(inputFileName, "r"):
+        data.append(line[:-1])
+
+    output = randomized_response_runner(config['n'], data)
+
+    endTime = time.time()
+    result = {'acc': output, 'time': (endTime - startTime), 'space': 0}
+    return result
 
 
 def randomized_response_runner():

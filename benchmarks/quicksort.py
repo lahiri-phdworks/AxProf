@@ -24,8 +24,18 @@ def inputParams(config, inputNum):
     return [config['n'], 1, 100000]
 
 
-def runner():
-    pass
+def runner(inputFileName, config):
+    startTime = time.time()
+
+    data = []
+    for line in open(inputFileName, "r"):
+        data.append(line[:-1])
+
+    output = quicksort_runner(config['n'], data)
+
+    endTime = time.time()
+    result = {'acc': output, 'time': (endTime - startTime), 'space': 0}
+    return result
 
 
 def quicksort_runner():
