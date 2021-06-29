@@ -5,12 +5,12 @@ import AxProf
 import random
 import time
 from scipy.stats import bernoulli
-
+from IPython.lib.pretty import pprint
 
 # choice : ForAll Variable.
 # door_switch : ForAll Variable
 configList = {'truth': [0, 1],
-              'first_flip': [0, 1], 'second_flip': [1]}
+              'first_flip': [0, 1]}
 
 # Axprof Specification for Monty Hall
 spec = '''
@@ -19,16 +19,16 @@ Output real;
 truth real;
 first_flip real;
 second_flip real;
-ACC Probability over runs [ Output == truth ] > 0.5
+ACC Probability over inputs [ Output == 1 ] >= 0.5
 '''
 
 random_runs = 1
-random_input_samples = 1
+random_input_samples = 500
 
 
 def inputParams(config, inputNum):
     # Randomly choose the second flip from AxProf.
-    return [config['second_flip'], 0, 1]
+    return [1, 0, 1]
 
 
 def runner(inputFileName, config):
@@ -38,17 +38,21 @@ def runner(inputFileName, config):
     for line in open(inputFileName, "r"):
         data.append(line[:-1])
 
-    output = randomized_response_runner(data[0], data[1], data[2])
+    output = randomized_response_runner(
+        config['truth'], config['first_flip'], data[0])
 
     endTime = time.time()
     result = {'acc': output, 'time': (
-        endTime - startTime), 'space': 0, 'random input': data}
+        endTime - startTime), 'space': 0, 'random input': {
+            'forall_truth': config['truth'], 'forall_first_flip': config['first_flip'], 'pse_second_flip': int(data[0])
+    }}
 
-    print(result)
+    pprint(result)
     return result
 
 
 def randomized_response_runner(truth, first_flip, second_flip):
+    ret = 0
     if first_flip == 0:
         ret = truth
     else:
@@ -56,7 +60,7 @@ def randomized_response_runner(truth, first_flip, second_flip):
             ret = 1
         else:
             ret = 0
-    pass
+    return 1 if ret == truth else 0
 
 
 if __name__ == '__main__':

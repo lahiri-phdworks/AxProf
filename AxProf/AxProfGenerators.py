@@ -22,7 +22,7 @@ def uniformGenerator(length, _min, _max, seed=None):
 
 
 # Generates a random uniform array of 0's and 1's
-def binaryVectorGenerator(length, runs):
+def binaryVectorGenerator(length):
     return [random.choice([0, 1]) for i in range(length)]
 
 # Samples WITHOUT REPLACEMENT integers within [_min,_max]

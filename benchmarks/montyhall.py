@@ -5,26 +5,28 @@ import AxProf
 import random
 import time
 from scipy.stats import bernoulli
-
+from IPython.lib.pretty import pprint
 
 # choice : ForAll Variable.
 # door_switch : ForAll Variable
 configList = {'choice': [1, 2, 3],
-              'door_switch': [0, 1], 'car_door': [1]}
+              'door_switch': [0, 1]}
 
 # Axprof Specification for Monty Hall
 spec = '''
 Input real;
 Output real;
-ACC Probability over inputs [ Output == 1 ] == 2/3
+choice real;
+door_switch real;
+ACC Probability over inputs [ Output == 1 ] >= 2/3
 '''
 
 random_runs = 1
-random_input_samples = 50
+random_input_samples = 500
 
 
 def inputParams(config, inputNum):
-    return [config['car_door'], 1, 3]
+    return [1, 1, 3]
 
 
 def runner(inputFileName, config):
@@ -35,6 +37,7 @@ def runner(inputFileName, config):
         data.append(line[:-1])
 
     output = monty_hall_runner(
+        # choice,         door_switch,           car_door
         config['choice'], config['door_switch'], int(data[0]))
 
     if output is False:
@@ -46,7 +49,7 @@ def runner(inputFileName, config):
     result = {'acc': output, 'time': (
         endTime - startTime), 'space': 0, 'random input': {'forall_choice': config['choice'],
                                                            'forall_door_switch': config['door_switch'], 'pse_car_door': int(data[0])}}
-    print(result, end=" #")
+    pprint(result)
     return result
 
 
@@ -68,7 +71,6 @@ def monty_hall_runner(choice, door_switch, car_door):
                     choice = 3
                 else:
                     choice = 2
-
             elif host_door == 2:
                 if choice == 1:
                     choice = 3
@@ -79,7 +81,7 @@ def monty_hall_runner(choice, door_switch, car_door):
                     choice = 2
                 else:
                     choice = 1
-            return choice == car_door
+        return choice == car_door
 
 
 if __name__ == '__main__':

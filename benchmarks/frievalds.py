@@ -9,25 +9,24 @@ from scipy.stats import bernoulli
 from IPython.lib.pretty import pprint
 
 # n : Size of the Square Matrix ForAll Variable.
-configList = {'n': [2, 3, 4, 5]}
+configList = {'forall_setting': range(10), 'n': [2, 3, 4, 5, 6]}
 
 # Axprof Specification for Frievald's algorithm
 spec = '''
 Input list of ( list of real );
 Output real;
 TIME n * n;
-ACC Probability over runs [ Output == 1 ] < 0.5
+ACC Probability over inputs [ Output == 1 ] >= 0.5
 '''
 
 random_runs = 1
-num_foralls = 1
-random_input_samples = 0
+random_input_samples = 10
 
 forAllInputArrays = []
 
 
 def inputParams(config, inputNum):
-    return [config['n'], random_runs]
+    return [config['n']]
 
 
 def runner(inputFileName, config):
@@ -37,23 +36,27 @@ def runner(inputFileName, config):
     for line in open(inputFileName, "r"):
         data.append(line[:-1])
 
-    output = frievalds_runner(config['n'], data)
+    output = frievalds_runner(config['forall_setting'], config['n'], [
+                              int(r) for r in data])
 
     endTime = time.time()
     result = {'acc': output, 'time': (
-        endTime - startTime), 'space': 0, 'random input': data}
-    print(f"Results for Random Input : {result}")
+        endTime - startTime), 'space': 0, 'random input': {
+            'forall_setting_index': config['forall_setting'], 'pse_r': [int(r) for r in data]
+    }}
+
+    pprint(result)
     return result
 
 
-def frievalds_runner(n, data):
+def frievalds_runner(forall_setting_index, n, r):
+    forAllInputArrays = for_all_inputs[forall_setting_index]
     A = forAllInputArrays[n - 2][0]
     B = forAllInputArrays[n - 2][1]
     C = forAllInputArrays[n - 2][2]
 
     # Randomly initialize r-vector
-    # TODO : Let AxProf Set this
-    r = [int(num) for num in data]
+    # TODO : r ==> Let AxProf Set this
 
     # B x r => Br
     Br = np.dot(B, r)
@@ -65,7 +68,7 @@ def frievalds_runner(n, data):
     Cr = np.dot(C, r)
 
     # A x B => C
-    # realC = np.dot(A, B)
+    realC = np.dot(A, B)
 
     # res = A x Br - Cr
     res = np.subtract(ABr, Cr)
@@ -76,13 +79,13 @@ def frievalds_runner(n, data):
         if i != 0:
             ret = 0
 
-    return 1
+    return ret
 
 
 if __name__ == '__main__':
 
     for_all_inputs = []
-    for j in range(num_foralls):
+    for j in configList['forall_setting']:
         single_forall_input = []
         for i in configList['n']:
             forAllObj = {}
@@ -94,21 +97,20 @@ if __name__ == '__main__':
                  for m in range(i)]
             single_forall_input.append([A, B, C])
         for_all_inputs.append(single_forall_input)
+
     """
-        For Each of the ForAll inputs, run AxProf "random_runs" times, 
-        each time with a different random setting.
+    For Each of the ForAll inputs, run AxProf "random_runs" times, 
+    each time with a different random setting.
     """
 
-    for forall_setting in range(len(for_all_inputs)):
-        forAllInputArrays = for_all_inputs[forall_setting]
-        startTime = time.time()  # Start measuring time
-        """
-        configList contains the ForAll setting for "n" [SIZE of Matrix].
-        """
-        AxProf.checkProperties(configList, random_runs, random_input_samples, AxProf.binaryVectorGenerator,
-                               inputParams, runner, spec=spec)
-        endTime = time.time()  # Stop measuring time
-        print(
-            f'Total time required for checking : {endTime - startTime} seconds.')
+    startTime = time.time()  # Start measuring time
+    """
+    configList contains the ForAll setting for "n" [SIZE of Matrix].
+    """
+    AxProf.checkProperties(configList, random_runs, random_input_samples, AxProf.binaryVectorGenerator,
+                           inputParams, runner, spec=spec)
+    endTime = time.time()  # Stop measuring time
+    print(
+        f'Total time required for checking : {endTime - startTime} seconds.')
 
 # ==============================================================================

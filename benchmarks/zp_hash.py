@@ -5,30 +5,29 @@ import AxProf
 import random
 import time
 from scipy.stats import bernoulli
-
+from IPython.lib.pretty import pprint
 
 # choice : ForAll Variable.
 # door_switch : ForAll Variable
-configList = {'choice': [1, 2, 3],
-              'door_switch': [0, 1], 'car_door': [1]}
+configList = {'prime': [3, 5, 7, 11, 13, 17], 'forall_setting': range(100)}
 
 # Axprof Specification for Monty Hall
 spec = '''
 Input list of real;
 Output real;
-prob real;
-y real;
-TIME coins;
-ACC Expectation over runs [Output] == coins * prob * y
+ACC Probability over inputs [ Output == 1 ] >= 0.5
 '''
 
 
 random_runs = 1
-random_input_samples = 1
+random_input_samples = 10
+forall_inputs = []
+
+# 2 ==> since we need a_j, & b_j
 
 
 def inputParams(config, inputNum):
-    return [config['coins'], 1, 3]
+    return [2, 0, config['prime']]
 
 
 def runner(inputFileName, config):
@@ -38,18 +37,36 @@ def runner(inputFileName, config):
     for line in open(inputFileName, "r"):
         data.append(line[:-1])
 
-    output = zp_hash_runner(config['n'], data)
+    w = random.randint(1, config['prime'])
+    output = zp_hash_runner(config['forall_setting'], int(data[0]),
+                            int(data[1]), config['prime'], w)
 
     endTime = time.time()
-    result = {'acc': output, 'time': (endTime - startTime), 'space': 0}
+    result = {'acc': output, 'time': (endTime - startTime), 'space': 0, 'space': 0, 'random input': {
+        'prime': config['prime'], 'a_j': int(data[0]), 'b_j': int(data[1]), 'w': w, 'forall_setting': config['forall_setting']
+    }}
+    pprint(result)
     return result
 
 
-def zp_hash_runner():
-    pass
+def zp_hash_runner(forall_index, a_j, b_j, prime, w):
+    x = forall_inputs[forall_index][0]
+    y = forall_inputs[forall_index][1]
+
+    hash_x = (a_j * x + b_j) % prime % w
+    hash_y = (a_j * y + b_j) % prime % w
+
+    if (hash_x == hash_y):
+        return 1
+    else:
+        return 0
 
 
 if __name__ == '__main__':
+    for index in configList['forall_setting']:
+        forall_inputs.append(
+            [random.randint(-5000, 5000), random.randint(5100, 10000)])
+
     startTime = time.time()  # Start measuring time
 
     """

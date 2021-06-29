@@ -55,7 +55,7 @@ def runner(inputFileName, config):
     output = countminsketch_runner(config['n'], data)
 
     endTime = time.time()
-    result = {'acc': output, 'time': (endTime - startTime), 'space': 0}
+    result = {'acc': output, 'time': (endTime - startTime)}
     return result
 
 

@@ -1,0 +1,619 @@
+Using existing 'outputs' directory for time and memory data
+Generated following checker functions from spec:
+from __main__ import *
+
+def perInpFunc(Config, Input, Runs, Output):
+  Output = Output['acc']
+  t0 = 0
+  for t1 in range(Runs):
+    t0 += 1 if ((Output[t1])==1) else 0
+  t2 = (AxProf.binomialTest(t0,Runs,0.5,alternative='less')>=0.05)
+  if not t2:
+    print('Checker detected a possible error')
+  return t2
+
+def inpAgg(agg,run,output):
+  if agg==None:
+    agg = {'acc':[], 'time':0, 'space':0}
+  agg['acc'].append(output['acc'])
+  agg['time'] = (agg['time']*run + output['time'])/(run+1)
+  agg['space'] = (agg['space']*run + output['space'])/(run+1)
+  return agg
+
+def cfgAgg(agg,input,inpAgg):
+  if agg==None:
+    agg = {'acc':[], 'time':0, 'space':0}
+  agg['time'] = (agg['time']*input + inpAgg['time'])/(input+1)
+  agg['space'] = (agg['space']*input + inpAgg['space'])/(input+1)
+  return agg
+
+def finalFunc(paramNames, outputs, runs, inputs):
+  times = {k:v['time'] for k, v in outputs.items()}
+  AxProf.dumpObtainedData(times,'outputs/reservior_sampling-timeData.txt',paramNames,dataName='time')
+  spaces = {k:v['space'] for k, v in outputs.items()}
+  AxProf.dumpObtainedData(spaces,'outputs/reservior_sampling-spaceData.txt',paramNames,dataName='space')
+
+  def timeFitFunc(Cfg,p0,p1):
+    return (p0*Cfg[0]+p1)
+
+  try:
+    popt, rsqd = AxProf.fitFuncToData(times,timeFitFunc,['n'],paramNames)
+    print('Time usage:\nOptimal curve fit parameters:',popt,'\nR^2 metric:',rsqd)
+  except (RuntimeError, TypeError):
+    print('Unable to find optimal curve fit parameters for time data')
+
+<function inpAgg at 0x7ff8b7d719d0> <function cfgAgg at 0x7ff8b7d71af0> None <function perInpFunc at 0x7ff8b7d71a60> None <function finalFunc at 0x7ff8b7d71b80>
+Using user-provided no. of runs: 1
+Using user-provided no. of inputs: 10
+Running test program for configuration {'n': 2}
+Random Input 1
+.{'acc': 1,
+ 'time': 8.893013000488281e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 2, 'forall_k': 2, 'input_arr': [1, 2]}}
+
+Random Input 2
+.{'acc': 1,
+ 'time': 4.506111145019531e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 2, 'forall_k': 2, 'input_arr': [1, 2]}}
+
+Random Input 3
+.{'acc': 1,
+ 'time': 4.1961669921875e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 2, 'forall_k': 2, 'input_arr': [1, 2]}}
+
+Random Input 4
+.{'acc': 1,
+ 'time': 4.1961669921875e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 2, 'forall_k': 2, 'input_arr': [1, 2]}}
+
+Random Input 5
+.{'acc': 1,
+ 'time': 4.267692565917969e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 2, 'forall_k': 2, 'input_arr': [1, 2]}}
+
+Random Input 6
+.{'acc': 0,
+ 'time': 5.2928924560546875e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 2, 'forall_k': 1, 'input_arr': [1, 2]}}
+
+Random Input 7
+.{'acc': 1,
+ 'time': 6.508827209472656e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 2, 'forall_k': 1, 'input_arr': [1, 2]}}
+
+Random Input 8
+.{'acc': 1,
+ 'time': 4.744529724121094e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 2, 'forall_k': 1, 'input_arr': [1, 2]}}
+
+Random Input 9
+.{'acc': 1,
+ 'time': 4.887580871582031e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 2, 'forall_k': 1, 'input_arr': [1, 2]}}
+
+Random Input 10
+.{'acc': 1,
+ 'time': 4.458427429199219e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 2, 'forall_k': 1, 'input_arr': [1, 2]}}
+
+Running test program for configuration {'n': 3}
+Random Input 1
+.{'acc': 1,
+ 'time': 4.9591064453125e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 3, 'forall_k': 3, 'input_arr': [1, 2, 3]}}
+
+Random Input 2
+.{'acc': 1,
+ 'time': 4.673004150390625e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 3, 'forall_k': 2, 'input_arr': [1, 2, 3]}}
+
+Random Input 3
+.{'acc': 1,
+ 'time': 4.458427429199219e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 3, 'forall_k': 1, 'input_arr': [1, 2, 3]}}
+
+Random Input 4
+.{'acc': 1,
+ 'time': 4.410743713378906e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 3, 'forall_k': 1, 'input_arr': [1, 2, 3]}}
+
+Random Input 5
+.{'acc': 0,
+ 'time': 4.363059997558594e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 3, 'forall_k': 2, 'input_arr': [1, 2, 3]}}
+
+Random Input 6
+.{'acc': 0,
+ 'time': 6.794929504394531e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 3, 'forall_k': 1, 'input_arr': [1, 2, 3]}}
+
+Random Input 7
+.{'acc': 1,
+ 'time': 6.175041198730469e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 3, 'forall_k': 3, 'input_arr': [1, 2, 3]}}
+
+Random Input 8
+.{'acc': 0,
+ 'time': 4.839897155761719e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 3, 'forall_k': 1, 'input_arr': [1, 2, 3]}}
+
+Random Input 9
+.{'acc': 1,
+ 'time': 4.601478576660156e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 3, 'forall_k': 2, 'input_arr': [1, 2, 3]}}
+
+Random Input 10
+.{'acc': 1,
+ 'time': 4.029273986816406e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 3, 'forall_k': 3, 'input_arr': [1, 2, 3]}}
+
+Running test program for configuration {'n': 4}
+Random Input 1
+.{'acc': 1,
+ 'time': 5.745887756347656e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 4, 'forall_k': 3, 'input_arr': [1, 2, 3, 4]}}
+
+Random Input 2
+.{'acc': 1,
+ 'time': 5.626678466796875e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 4, 'forall_k': 4, 'input_arr': [1, 2, 3, 4]}}
+
+Random Input 3
+.{'acc': 0,
+ 'time': 4.2438507080078125e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 4, 'forall_k': 3, 'input_arr': [1, 2, 3, 4]}}
+
+Random Input 4
+.{'acc': 0,
+ 'time': 4.601478576660156e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 4, 'forall_k': 2, 'input_arr': [1, 2, 3, 4]}}
+
+Random Input 5
+.{'acc': 0,
+ 'time': 5.078315734863281e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 4, 'forall_k': 2, 'input_arr': [1, 2, 3, 4]}}
+
+Random Input 6
+.{'acc': 0,
+ 'time': 5.841255187988281e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 4, 'forall_k': 2, 'input_arr': [1, 2, 3, 4]}}
+
+Random Input 7
+.{'acc': 1,
+ 'time': 4.553794860839844e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 4, 'forall_k': 3, 'input_arr': [1, 2, 3, 4]}}
+
+Random Input 8
+.{'acc': 1,
+ 'time': 4.124641418457031e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 4, 'forall_k': 4, 'input_arr': [1, 2, 3, 4]}}
+
+Random Input 9
+.{'acc': 1,
+ 'time': 4.482269287109375e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 4, 'forall_k': 3, 'input_arr': [1, 2, 3, 4]}}
+
+Random Input 10
+.{'acc': 1,
+ 'time': 4.553794860839844e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 4, 'forall_k': 4, 'input_arr': [1, 2, 3, 4]}}
+
+Running test program for configuration {'n': 5}
+Random Input 1
+.{'acc': 0,
+ 'time': 4.553794860839844e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 5, 'forall_k': 1, 'input_arr': [1, 2, 3, 4, 5]}}
+
+Random Input 2
+.{'acc': 1,
+ 'time': 7.390975952148438e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 5, 'forall_k': 3, 'input_arr': [1, 2, 3, 4, 5]}}
+
+Random Input 3
+.{'acc': 1,
+ 'time': 4.887580871582031e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 5, 'forall_k': 4, 'input_arr': [1, 2, 3, 4, 5]}}
+
+Random Input 4
+.{'acc': 0,
+ 'time': 5.173683166503906e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 5, 'forall_k': 1, 'input_arr': [1, 2, 3, 4, 5]}}
+
+Random Input 5
+.{'acc': 1,
+ 'time': 7.367134094238281e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 5, 'forall_k': 5, 'input_arr': [1, 2, 3, 4, 5]}}
+
+Random Input 6
+.{'acc': 0,
+ 'time': 0.00010633468627929688,
+ 'space': 0,
+ 'random input': {'forall_n': 5, 'forall_k': 2, 'input_arr': [1, 2, 3, 4, 5]}}
+
+Random Input 7
+.{'acc': 1,
+ 'time': 5.984306335449219e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 5, 'forall_k': 3, 'input_arr': [1, 2, 3, 4, 5]}}
+
+Random Input 8
+.{'acc': 1,
+ 'time': 6.198883056640625e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 5, 'forall_k': 4, 'input_arr': [1, 2, 3, 4, 5]}}
+
+Random Input 9
+.{'acc': 0,
+ 'time': 6.103515625e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 5, 'forall_k': 1, 'input_arr': [1, 2, 3, 4, 5]}}
+
+Random Input 10
+.{'acc': 0,
+ 'time': 7.772445678710938e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 5, 'forall_k': 3, 'input_arr': [1, 2, 3, 4, 5]}}
+
+Running test program for configuration {'n': 6}
+Random Input 1
+.{'acc': 0,
+ 'time': 7.557868957519531e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 6,
+  'forall_k': 2,
+  'input_arr': [1, 2, 3, 4, 5, 6]}}
+
+Random Input 2
+.{'acc': 1,
+ 'time': 7.724761962890625e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 6,
+  'forall_k': 5,
+  'input_arr': [1, 2, 3, 4, 5, 6]}}
+
+Random Input 3
+.{'acc': 0,
+ 'time': 7.605552673339844e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 6,
+  'forall_k': 2,
+  'input_arr': [1, 2, 3, 4, 5, 6]}}
+
+Random Input 4
+.{'acc': 0,
+ 'time': 7.724761962890625e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 6,
+  'forall_k': 1,
+  'input_arr': [1, 2, 3, 4, 5, 6]}}
+
+Random Input 5
+.{'acc': 0,
+ 'time': 6.532669067382812e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 6,
+  'forall_k': 4,
+  'input_arr': [1, 2, 3, 4, 5, 6]}}
+
+Random Input 6
+.{'acc': 1,
+ 'time': 6.0558319091796875e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 6,
+  'forall_k': 2,
+  'input_arr': [1, 2, 3, 4, 5, 6]}}
+
+Random Input 7
+.{'acc': 1,
+ 'time': 4.792213439941406e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 6,
+  'forall_k': 3,
+  'input_arr': [1, 2, 3, 4, 5, 6]}}
+
+Random Input 8
+.{'acc': 1,
+ 'time': 8.392333984375e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 6,
+  'forall_k': 6,
+  'input_arr': [1, 2, 3, 4, 5, 6]}}
+
+Random Input 9
+.{'acc': 1,
+ 'time': 7.033348083496094e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 6,
+  'forall_k': 5,
+  'input_arr': [1, 2, 3, 4, 5, 6]}}
+
+Random Input 10
+.{'acc': 0,
+ 'time': 4.8160552978515625e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 6,
+  'forall_k': 1,
+  'input_arr': [1, 2, 3, 4, 5, 6]}}
+
+Running test program for configuration {'n': 7}
+Random Input 1
+.{'acc': 1,
+ 'time': 5.245208740234375e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 7,
+  'forall_k': 6,
+  'input_arr': [1, 2, 3, 4, 5, 6, 7]}}
+
+Random Input 2
+.{'acc': 1,
+ 'time': 4.76837158203125e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 7,
+  'forall_k': 6,
+  'input_arr': [1, 2, 3, 4, 5, 6, 7]}}
+
+Random Input 3
+.{'acc': 1,
+ 'time': 6.270408630371094e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 7,
+  'forall_k': 6,
+  'input_arr': [1, 2, 3, 4, 5, 6, 7]}}
+
+Random Input 4
+.{'acc': 0,
+ 'time': 5.269050598144531e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 7,
+  'forall_k': 1,
+  'input_arr': [1, 2, 3, 4, 5, 6, 7]}}
+
+Random Input 5
+.{'acc': 1,
+ 'time': 4.76837158203125e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 7,
+  'forall_k': 4,
+  'input_arr': [1, 2, 3, 4, 5, 6, 7]}}
+
+Random Input 6
+.{'acc': 1,
+ 'time': 4.6253204345703125e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 7,
+  'forall_k': 7,
+  'input_arr': [1, 2, 3, 4, 5, 6, 7]}}
+
+Random Input 7
+.{'acc': 1,
+ 'time': 4.7206878662109375e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 7,
+  'forall_k': 5,
+  'input_arr': [1, 2, 3, 4, 5, 6, 7]}}
+
+Random Input 8
+.{'acc': 1,
+ 'time': 4.38690185546875e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 7,
+  'forall_k': 7,
+  'input_arr': [1, 2, 3, 4, 5, 6, 7]}}
+
+Random Input 9
+.{'acc': 1,
+ 'time': 5.221366882324219e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 7,
+  'forall_k': 6,
+  'input_arr': [1, 2, 3, 4, 5, 6, 7]}}
+
+Random Input 10
+.{'acc': 1,
+ 'time': 5.3882598876953125e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 7,
+  'forall_k': 5,
+  'input_arr': [1, 2, 3, 4, 5, 6, 7]}}
+
+Running test program for configuration {'n': 8}
+Random Input 1
+.{'acc': 1,
+ 'time': 6.031990051269531e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 8,
+  'forall_k': 8,
+  'input_arr': [1, 2, 3, 4, 5, 6, 7, 8]}}
+
+Random Input 2
+.{'acc': 1,
+ 'time': 4.696846008300781e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 8,
+  'forall_k': 6,
+  'input_arr': [1, 2, 3, 4, 5, 6, 7, 8]}}
+
+Random Input 3
+.{'acc': 1,
+ 'time': 7.009506225585938e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 8,
+  'forall_k': 5,
+  'input_arr': [1, 2, 3, 4, 5, 6, 7, 8]}}
+
+Random Input 4
+.{'acc': 1,
+ 'time': 7.43865966796875e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 8,
+  'forall_k': 5,
+  'input_arr': [1, 2, 3, 4, 5, 6, 7, 8]}}
+
+Random Input 5
+.{'acc': 0,
+ 'time': 5.984306335449219e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 8,
+  'forall_k': 3,
+  'input_arr': [1, 2, 3, 4, 5, 6, 7, 8]}}
+
+Random Input 6
+.{'acc': 1,
+ 'time': 0.00010442733764648438,
+ 'space': 0,
+ 'random input': {'forall_n': 8,
+  'forall_k': 8,
+  'input_arr': [1, 2, 3, 4, 5, 6, 7, 8]}}
+
+Random Input 7
+.{'acc': 1,
+ 'time': 5.078315734863281e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 8,
+  'forall_k': 5,
+  'input_arr': [1, 2, 3, 4, 5, 6, 7, 8]}}
+
+Random Input 8
+.{'acc': 1,
+ 'time': 4.220008850097656e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 8,
+  'forall_k': 8,
+  'input_arr': [1, 2, 3, 4, 5, 6, 7, 8]}}
+
+Random Input 9
+.{'acc': 0,
+ 'time': 4.863739013671875e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 8,
+  'forall_k': 2,
+  'input_arr': [1, 2, 3, 4, 5, 6, 7, 8]}}
+
+Random Input 10
+.{'acc': 1,
+ 'time': 5.245208740234375e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 8,
+  'forall_k': 5,
+  'input_arr': [1, 2, 3, 4, 5, 6, 7, 8]}}
+
+Running test program for configuration {'n': 9}
+Random Input 1
+.{'acc': 0,
+ 'time': 7.486343383789062e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 9,
+  'forall_k': 4,
+  'input_arr': [1, 2, 3, 4, 5, 6, 7, 8, 9]}}
+
+Random Input 2
+.{'acc': 0,
+ 'time': 5.555152893066406e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 9,
+  'forall_k': 2,
+  'input_arr': [1, 2, 3, 4, 5, 6, 7, 8, 9]}}
+
+Random Input 3
+.{'acc': 1,
+ 'time': 6.031990051269531e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 9,
+  'forall_k': 8,
+  'input_arr': [1, 2, 3, 4, 5, 6, 7, 8, 9]}}
+
+Random Input 4
+.{'acc': 1,
+ 'time': 4.887580871582031e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 9,
+  'forall_k': 5,
+  'input_arr': [1, 2, 3, 4, 5, 6, 7, 8, 9]}}
+
+Random Input 5
+.{'acc': 1,
+ 'time': 4.863739013671875e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 9,
+  'forall_k': 8,
+  'input_arr': [1, 2, 3, 4, 5, 6, 7, 8, 9]}}
+
+Random Input 6
+.{'acc': 1,
+ 'time': 5.91278076171875e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 9,
+  'forall_k': 7,
+  'input_arr': [1, 2, 3, 4, 5, 6, 7, 8, 9]}}
+
+Random Input 7
+.{'acc': 1,
+ 'time': 6.508827209472656e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 9,
+  'forall_k': 9,
+  'input_arr': [1, 2, 3, 4, 5, 6, 7, 8, 9]}}
+
+Random Input 8
+.{'acc': 1,
+ 'time': 4.553794860839844e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 9,
+  'forall_k': 9,
+  'input_arr': [1, 2, 3, 4, 5, 6, 7, 8, 9]}}
+
+Random Input 9
+.{'acc': 0,
+ 'time': 4.8160552978515625e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 9,
+  'forall_k': 2,
+  'input_arr': [1, 2, 3, 4, 5, 6, 7, 8, 9]}}
+
+Random Input 10
+.{'acc': 1,
+ 'time': 4.863739013671875e-05,
+ 'space': 0,
+ 'random input': {'forall_n': 9,
+  'forall_k': 9,
+  'input_arr': [1, 2, 3, 4, 5, 6, 7, 8, 9]}}
+
+Time usage:
+Optimal curve fit parameters: [1.08139865e-06 5.04979060e-05] 
+R^2 metric: 0.11817959605717165
+Total time required for checking : 0.23752880096435547 seconds.

@@ -6,6 +6,7 @@ import random
 import sys
 import time
 from scipy.stats import bernoulli
+from IPython.lib.pretty import pprint
 
 # We want to try with these number of coins the flipping experiment.
 # We specify number of coin-flips here .
@@ -14,7 +15,7 @@ from scipy.stats import bernoulli
 # coins : n -> this is a ForAll Variable.
 # prob : p -> ForAll Variable
 # y : addendum if flip is 1, ForAll Variable
-configList = {'coins': [500, 1500, 2500, 5000],
+configList = {'coins': [10, 100, 200],
               'prob': [0.01, 0.09, 0.10, 0.20, 0.25, 0.375, 0.50, 0.67, 0.75, 0.85, 0.90],
               'y': [5, 10, 20, 30, 50, 85, 96, 100]}
 
@@ -34,11 +35,11 @@ Output real;
 prob real;
 y real;
 TIME coins;
-ACC Expectation over runs [Output] == coins * prob * y
+ACC Expectation over runs [ Output ] == coins * prob * y
 '''
 
 
-random_runs = 1000
+random_runs = 100
 random_input_samples = 1
 
 
@@ -50,7 +51,7 @@ random_input_samples = 1
 
 
 def inputParams(config, inputNum):
-    return [config['coins'], 0, 1000000]
+    return [config['coins']]
 
 # This tells AxProf's distinctIntegerGenerator to generate distinct integers
 # between 0 and 1000000. The number of integers generated is equal to the number
@@ -81,12 +82,16 @@ def runner(inputFileName, config):
         [Sum]: [NUmber of HEADS in the coin flip experiment]
     """
     coinSum = flipCoins(
-        config['coins'], config['prob'], config['y'])  # flipCoins(config['coins']) Same Value as expected.
+        config['coins'], config['prob'], config['y'], [int(elem) for elem in data])  # flipCoins(config['coins']) Same Value as expected.
 
     endTime = time.time()  # Stop measuring time
 
     # Prepare result; we don't measure memory but must specify it, so set it to 0
-    result = {'acc': coinSum, 'time': (endTime - startTime), 'space': 0}
+    result = {'acc': coinSum, 'time': (endTime - startTime), 'space': 0, 'space': 0, 'random input': {
+        'forall_n': config['coins'], 'forall_prob': config['prob'], 'forall_y': config['y']
+    }}
+
+    pprint(result)
     return result
 
     """[What flipCoin does?]
@@ -104,14 +109,15 @@ flipping number of coins == numCoins with H/T based on a dist.
 """
 
 
-def flipCoins(n, prob, y):
-    random.seed()  # Seed RNG
+def flipCoins(n, prob, y, random_flips_vector):
     coinSum = 0
+    # print(random_flips_vector)
     for i in range(n):
 
         # Set x = 0. Instead of random-choice
         # it is a bernoulli.rvs(p, size=1)
         r = bernoulli.rvs(prob, size=1)
+        # r = val
         if (r):
             coinSum += y
 
@@ -147,7 +153,7 @@ if __name__ == '__main__':
 
     configList contains the ForAlls.
     """
-    AxProf.checkProperties(configList, random_runs, random_input_samples, AxProf.distinctIntegerGenerator,
+    AxProf.checkProperties(configList, random_runs, random_input_samples, AxProf.binaryVectorGenerator,
                            inputParams, runner, spec=spec)
     endTime = time.time()  # Stop measuring time
     print(f'Total time required for checking : {endTime - startTime} seconds.')

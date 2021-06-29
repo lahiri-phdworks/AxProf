@@ -8,7 +8,7 @@ from scipy.stats import bernoulli
 
 
 # n : Array Size ForAll Variable.
-configList = {'n': [2, 3, 4, 5, 6, 7, 8]}
+configList = {'n': [2, 3, 4, 5, 6, 7, 8], 'forall_setting': range(100)}
 
 # Axprof Specification for QuickSort Algorithm.
 spec = '''
@@ -20,7 +20,8 @@ ACC Expectation over runs [Output] == ???
 '''
 
 random_runs = 1
-random_input_samples = 1
+random_input_samples = 100
+quicksort_arrays = []
 
 
 def inputParams(config, inputNum):
@@ -34,7 +35,8 @@ def runner(inputFileName, config):
     for line in open(inputFileName, "r"):
         data.append(line[:-1])
 
-    output = quicksort_runner(config['n'], data)
+    output = quicksort_runner(
+        quicksort_arrays[config['n'] - 2][config['forall_setting']], int(data[0]))
 
     endTime = time.time()
     result = {'acc': output, 'time': (endTime - startTime), 'space': 0}
@@ -46,6 +48,15 @@ def quicksort_runner():
 
 
 if __name__ == '__main__':
+    for sizes in configList['n']:
+        forall_arrays = []
+        for index in configList['forall_setting']:
+            forall_inputs = []
+            for i in range(sizes):
+                forall_inputs.append(random.randint(-15000, 15000))
+            forall_arrays.append(forall_inputs)
+        quicksort_arrays.append(forall_arrays)
+
     startTime = time.time()  # Start measuring time
 
     """

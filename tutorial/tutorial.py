@@ -108,7 +108,8 @@ def runner(inputFileName, config):
     coinSum = flipCoins(config['coins'])
     endTime = time.time()  # Stop measuring time
     # Prepare result; we don't measure memory but must specify it, so set it to 0
-    result = {'acc': coinSum, 'time': (endTime-startTime), 'space': 0}
+    result = {'acc': coinSum, 'time': (
+        endTime-startTime), 'space': 0, 'space': 0, }
     return result
 
 

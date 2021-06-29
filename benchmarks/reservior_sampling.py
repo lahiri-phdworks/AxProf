@@ -5,30 +5,29 @@ import AxProf
 import random
 import time
 from scipy.stats import bernoulli
-
+from IPython.lib.pretty import pprint
 
 # n : ForAll Variable.
 # k : ForAll Variable
-configList = {'n': [2, 3, 4, 5, 6, 7, 8, 9],
-              'k': [2, 3, 4, 5, 6, 7, 8, 9, 10]}
+configList = {'n': [2, 3, 4, 5, 6, 7, 8, 9]}
 
 # Axprof Specification for Monty Hall
 spec = '''
 Input list of real;
 Output real;
 n real;
-k real;
 TIME n;
-ACC Probability over runs [ Output == 1 ] > 0.5
+ACC Probability over runs [ Output == 1 ] >= 0.5
 '''
 
 
-random_runs = 10
-random_input_samples = 1
+random_runs = 1
+random_input_samples = 10
 
 
 def inputParams(config, inputNum):
-    return [config['n'], 1, 100000]
+    # "k" is sampled from 1 to "n" value, k <= n
+    return [1, 1, config['n']]
 
 
 def runner(inputFileName, config):
@@ -39,17 +38,24 @@ def runner(inputFileName, config):
         data.append(line[:-1])
 
     # Send a randomly intialized array of size "n".
-    # print(data)
-    output = reservoir_sampling_runner(
-        [int(elem) for elem in data], config['n'], config['k'])
+    arr = [elem + 1 for elem in range(config['n'])]
+    output = reservoir_sampling_runner(arr, config['n'], int(data[0]))
 
     endTime = time.time()
-    result = {'acc': 1, 'time': (endTime - startTime), 'space': 0}
+    result = {'acc': output, 'time': (endTime - startTime), 'space': 0, 'random input': {
+        'forall_n': config['n'], 'forall_k':  int(data[0]), 'input_arr': arr
+    }}
+    pprint(result)
     return result
 
 
 def reservoir_sampling_runner(arr, n, k):
     sample = [0] * k
+
+    i = 0
+    while i < k:
+        sample[i] = arr[i]
+        i = i + 1
 
     i = k
     while i < n:
