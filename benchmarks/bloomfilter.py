@@ -5,7 +5,7 @@ import AxProf
 import random
 import time
 from scipy.stats import bernoulli
-
+from subprocess import run, CalledProcessError
 
 # choice : ForAll Variable.
 # door_switch : ForAll Variable
@@ -25,6 +25,21 @@ ACC Expectation over runs [Output] == coins * prob * y
 
 random_runs = 1
 random_input_samples = 1
+
+
+def execute(executable, inFile, outfile, errFile):
+    try:
+        output = run(
+            f"bin/{executable} < {inFile} > {outfile} 2> {errFile}",
+            shell=True,
+            capture_output=False,
+            text=True,
+        )
+    except CalledProcessError as err:
+        print(f"Execute Error : {err}")
+    else:
+        pass
+    return output.returncode
 
 
 def inputParams(config, inputNum):

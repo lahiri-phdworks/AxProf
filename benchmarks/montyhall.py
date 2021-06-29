@@ -10,17 +10,17 @@ from scipy.stats import bernoulli
 # choice : ForAll Variable.
 # door_switch : ForAll Variable
 configList = {'choice': [1, 2, 3],
-              'door_switch': [0, 1], 'car_door': [1, 2, 3]}
+              'door_switch': [0, 1], 'car_door': [1]}
 
 # Axprof Specification for Monty Hall
 spec = '''
 Input real;
 Output real;
-ACC Probability over runs [ Output == 1 ] <= 2/3
+ACC Probability over inputs [ Output == 1 ] == 2/3
 '''
 
 random_runs = 1
-random_input_samples = 1
+random_input_samples = 50
 
 
 def inputParams(config, inputNum):
@@ -34,19 +34,23 @@ def runner(inputFileName, config):
     for line in open(inputFileName, "r"):
         data.append(line[:-1])
 
-    print(data)
-    output = monty_hall_runner(data[0], data[1], data[2])
+    output = monty_hall_runner(
+        config['choice'], config['door_switch'], int(data[0]))
+
+    if output is False:
+        output = 0
+    else:
+        output = 1
 
     endTime = time.time()
     result = {'acc': output, 'time': (
-        endTime - startTime), 'space': 0, 'random input': config}
-    print(result)
+        endTime - startTime), 'space': 0, 'random input': {'forall_choice': config['choice'],
+                                                           'forall_door_switch': config['door_switch'], 'pse_car_door': int(data[0])}}
+    print(result, end=" #")
     return result
 
 
 def monty_hall_runner(choice, door_switch, car_door):
-    print(f"Choice : {choice}, Door Switch : {door_switch}")
-
     if choice == car_door:
         return door_switch != 1
     else:

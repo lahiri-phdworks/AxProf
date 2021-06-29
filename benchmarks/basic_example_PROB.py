@@ -37,7 +37,7 @@ ACC Probability over inputs [ Output < 0.4 * coins * y ] <= 0.45
 '''
 
 
-random_runs = 1
+random_runs = 1000
 random_input_samples = 1
 
 

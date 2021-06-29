@@ -38,7 +38,7 @@ ACC Expectation over runs [Output] == coins * prob * y
 '''
 
 
-random_runs = 1
+random_runs = 1000
 random_input_samples = 1
 
 
