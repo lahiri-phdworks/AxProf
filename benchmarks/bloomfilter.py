@@ -10,7 +10,7 @@ from subprocess import run, CalledProcessError
 from IPython.lib.pretty import pprint
 
 # n : ForAll Variable. Entries in bloomfilter
-configList = {'n': [3, 4, 5, 6, 7]}
+configList = {'entries': [3, 4, 5, 6, 7]}
 
 # Axprof Specification for Bloom Filter
 spec = '''
@@ -21,9 +21,9 @@ ACC Probability over inputs [ Output == 1 ] >= 0.5
 '''
 
 
-runs_per_input = 1
-num_input_samples = 1
-string_data_set = []
+runs_per_input = 10
+num_input_samples = 20
+forall_strings = []
 
 
 def execute(inFile, outfile, errFile):
@@ -42,7 +42,7 @@ def execute(inFile, outfile, errFile):
 
 
 def inputParams(config, inputNum):
-    return [0.01, 0.99]
+    return [2, 0, config['entries'] - 1]
 
 
 def runner(inputFileName, config):
@@ -54,35 +54,49 @@ def runner(inputFileName, config):
 
     # data[0] is the false positive rate
     output = 0
-    output = bloom_filter_runner(config['n'], float(data[0]))
+
+    output = bloom_filter_runner(
+        config['entries'], config['error'], int(data[0]), int(data[1]), config['forall_settings'])
 
     endTime = time.time()
-    result = {'acc': output, 'time': (endTime - startTime), 'space': 0}
+    result = {'acc': output, 'time': (endTime - startTime), 'space': 0, 'random input': {
+        'error': config['error'], 'entries': config['entries'], 'add_index': int(data[0]), 'seach_index': int(data[1]), 'forall_setting': config['forall_settings']
+    }}
     pprint(result)
     return result
 
 
-def bloom_filter_runner(entries, error):
+def bloom_filter_runner(entries, error, add_key, search_key, forall_input):
     with open(f"tests/bloomfilter_{entries}.txt", mode="w") as fileptr:
         fileptr.write(f"{entries}\n")
         fileptr.write(f"{entries}\n")
         fileptr.write(f"{error}\n")
-        fileptr.write(f"{random.randint(0, entries - 1)}\n")
-        fileptr.write(f"{random.randint(0, entries - 1)}\n")
-        for strings in string_data_set[entries - 3]:
+        fileptr.write(f"{add_key}\n")
+        fileptr.write(f"{search_key}\n")
+        for strings in forall_strings[forall_input][entries - 3]:
             fileptr.write(f"{strings}\n")
     return execute(f"tests/bloomfilter_{entries}.txt", f"tests/output_{entries}.txt", f"tests/error_{entries}.txt")
 
 
 if __name__ == '__main__':
     # Generate a set of strings that are to be added to the bloomfilter.
-    for entries in configList['n']:
-        string_data = []
-        for j in range(entries):
-            strings = ''.join(random.SystemRandom().choice(
-                string.ascii_uppercase + string.digits) for _ in range(10))
-            string_data.append(strings)
-        string_data_set.append(string_data)
+    errors = []
+    for i in range(25):
+        errors.append(random.uniform(0.01, 0.999))
+
+    configList['error'] = errors
+    configList['forall_settings'] = range(10)
+
+    for k in configList['forall_settings']:
+        string_data_set = []
+        for entries in configList['entries']:
+            string_data = []
+            for j in range(entries):
+                strings = ''.join(random.SystemRandom().choice(
+                    string.ascii_uppercase + string.digits) for _ in range(10))
+                string_data.append(strings)
+            string_data_set.append(string_data)
+        forall_strings.append(string_data_set)
 
     startTime = time.time()  # Start measuring time
 
@@ -93,7 +107,7 @@ if __name__ == '__main__':
 
     configList contains the ForAlls.
     """
-    AxProf.checkProperties(configList, runs_per_input, num_input_samples, AxProf.singleUniformGenerator,
+    AxProf.checkProperties(configList, runs_per_input, num_input_samples, AxProf.distinctIntegerGenerator,
                            inputParams, runner, spec=spec)
     endTime = time.time()  # Stop measuring time
     print(f'Total time required for checking : {endTime - startTime} seconds.')
