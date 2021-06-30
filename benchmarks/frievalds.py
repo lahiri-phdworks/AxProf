@@ -19,8 +19,8 @@ TIME n * n;
 ACC Probability over inputs [ Output == 1 ] >= 0.5
 '''
 
-random_runs = 1
-random_input_samples = 10
+runs_per_input = 1
+num_input_samples = 10
 
 forAllInputArrays = []
 
@@ -99,7 +99,7 @@ if __name__ == '__main__':
         for_all_inputs.append(single_forall_input)
 
     """
-    For Each of the ForAll inputs, run AxProf "random_runs" times, 
+    For Each of the ForAll inputs, run AxProf "runs_per_input" times, 
     each time with a different random setting.
     """
 
@@ -107,7 +107,7 @@ if __name__ == '__main__':
     """
     configList contains the ForAll setting for "n" [SIZE of Matrix].
     """
-    AxProf.checkProperties(configList, random_runs, random_input_samples, AxProf.binaryVectorGenerator,
+    AxProf.checkProperties(configList, runs_per_input, num_input_samples, AxProf.binaryVectorGenerator,
                            inputParams, runner, spec=spec)
     endTime = time.time()  # Stop measuring time
     print(

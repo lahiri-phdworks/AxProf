@@ -10,3 +10,6 @@ python3 zp_hash.py > logs/zp_hash.log
 python3 randomized_response.py > logs/randomized_response.log
 python3 frievalds.py > logs/frievalds.log   
 python3 partition.py > logs/partition.log
+python3 quicksort_fixed.py > logs/quicksort_fixed.log
+python3 bloomfilter.py > logs/bloomfilter.log
+python3 countminsketch.py > logs/countminsketch.log

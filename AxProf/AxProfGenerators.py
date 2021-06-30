@@ -20,6 +20,13 @@ def uniformGenerator(length, _min, _max, seed=None):
     random.seed(seed)
     return [random.uniform(_min, _max) for _ in range(length)]
 
+# Generates uniformly chosen numbers within [_min,_max)
+
+
+def singleUniformGenerator(_min, _max, seed=None):
+    random.seed(seed)
+    return [random.uniform(_min, _max)]
+
 
 # Generates a random uniform array of 0's and 1's
 def binaryVectorGenerator(length):

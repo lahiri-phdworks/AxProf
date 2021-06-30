@@ -19,18 +19,22 @@ using namespace std;
    unsigned int estimate(char *item);
 **/
 
-unsigned int my_hash(struct prob_hash *prob_hash, int key, unsigned int max) {
+unsigned int my_hash(struct prob_hash *prob_hash, int key, unsigned int max)
+{
   auto found = prob_hash->map.find(key);
 
   // If the key is not in the map, get a random element and rehash
-  if (found == prob_hash->map.end()) {
+  if (found == prob_hash->map.end())
+  {
     std::default_random_engine generator;
     std::uniform_int_distribution<int> range_dist(0, (int)max);
     unsigned int x = range_dist(generator);
     // make_pse_symbolic(&x, sizeof(x), "x_sym", 0, (int)max);
     prob_hash->map[key] = x;
     return x;
-  } else {
+  }
+  else
+  {
     return found->second;
   }
 }
@@ -38,11 +42,15 @@ unsigned int my_hash(struct prob_hash *prob_hash, int key, unsigned int max) {
 // CountMinSketch constructor
 // ep -> error 0.01 < ep < 1 (the smaller the better)
 // gamma -> probability for error (the smaller the better) 0 < gamm < 1
-CountMinSketch::CountMinSketch(float ep, float gamm) {
-  if (!(0.009 <= ep && ep < 1)) {
+CountMinSketch::CountMinSketch(float ep, float gamm)
+{
+  if (!(0.009 <= ep && ep < 1))
+  {
     cout << "eps must be in this range: [0.01, 1)" << endl;
     exit(EXIT_FAILURE);
-  } else if (!(0 < gamm && gamm < 1)) {
+  }
+  else if (!(0 < gamm && gamm < 1))
+  {
     cout << "gamma must be in this range: (0,1)" << endl;
     exit(EXIT_FAILURE);
   }
@@ -54,9 +62,11 @@ CountMinSketch::CountMinSketch(float ep, float gamm) {
   // initialize counter array of arrays, C
   C = new int *[d];
   unsigned int i, j;
-  for (i = 0; i < d; i++) {
+  for (i = 0; i < d; i++)
+  {
     C[i] = new int[w];
-    for (j = 0; j < w; j++) {
+    for (j = 0; j < w; j++)
+    {
       C[i][j] = 0;
     }
   }
@@ -72,10 +82,12 @@ CountMinSketch::CountMinSketch(float ep, float gamm) {
 }
 
 // CountMinSkectch destructor
-CountMinSketch::~CountMinSketch() {
+CountMinSketch::~CountMinSketch()
+{
   // free array of counters, C
   unsigned int i;
-  for (i = 0; i < d; i++) {
+  for (i = 0; i < d; i++)
+  {
     delete[] C[i];
   }
   delete[] C;
@@ -93,26 +105,31 @@ CountMinSketch::~CountMinSketch() {
 unsigned int CountMinSketch::totalcount() { return total; }
 
 // countMinSketch update item count (int)
-void CountMinSketch::update(int item, int c) {
+void CountMinSketch::update(int item, int c)
+{
   total = total + c;
   unsigned int hashval = 0;
-  for (unsigned int j = 0; j < d; j++) {
+  for (unsigned int j = 0; j < d; j++)
+  {
     hashval = my_hash(&hash_fns[j], item, w - 1);
     C[j][hashval] = C[j][hashval] + c;
   }
 }
 
 // countMinSketch update item count (string)
-void CountMinSketch::update(const char *str, int c) {
+void CountMinSketch::update(const char *str, int c)
+{
   int hashval = hashstr(str);
   update(hashval, c);
 }
 
 // CountMinSketch estimate item count (int)
-unsigned int CountMinSketch::estimate(int item) {
+unsigned int CountMinSketch::estimate(int item)
+{
   int minval = numeric_limits<int>::max();
   unsigned int hashval = 0;
-  for (unsigned int j = 0; j < d; j++) {
+  for (unsigned int j = 0; j < d; j++)
+  {
     // hashval = ((long)hashes[j][0]*item+hashes[j][1])%LONG_PRIME%w;
     hashval = my_hash(&hash_fns[j], item, w - 1);
     minval = MIN(minval, C[j][hashval]);
@@ -121,63 +138,89 @@ unsigned int CountMinSketch::estimate(int item) {
 }
 
 // CountMinSketch estimate item count (string)
-unsigned int CountMinSketch::estimate(const char *str) {
+unsigned int CountMinSketch::estimate(const char *str)
+{
   int hashval = hashstr(str);
   return estimate(hashval);
 }
 
 // generates aj,bj from field Z_p for use in hashing
-void CountMinSketch::genajbj(int **hashes, int i) {
+void CountMinSketch::genajbj(int **hashes, int i)
+{
   hashes[i][0] = int(float(rand()) * float(LONG_PRIME) / float(RAND_MAX) + 1);
   hashes[i][1] = int(float(rand()) * float(LONG_PRIME) / float(RAND_MAX) + 1);
 }
 
 // generates a hash value for a sting
 // same as djb2 hash function
-unsigned int CountMinSketch::hashstr(const char *str) {
+unsigned int CountMinSketch::hashstr(const char *str)
+{
   unsigned long hash = 5381;
   int c;
-  while (c = *str++) {
+  while (c = *str++)
+  {
     hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
   }
   return hash;
 }
 
-int main() {
+int main()
+{
 
-  std::default_random_engine generator;
-  std::uniform_int_distribution<int> dataRange(INT32_MIN, INT32_MAX);
-  std::uniform_real_distribution<float> ep_range(0.01, 1);
-  std::uniform_real_distribution<float> gamm_range(0, 1);
+  // std::default_random_engine generator;
+  // std::uniform_int_distribution<int> dataRange(INT32_MIN, INT32_MAX);
+  // std::uniform_real_distribution<float> ep_range(0.01, 1);
+  // std::uniform_real_distribution<float> gamm_range(0, 1);
 
-  // float ep = ep_range(generator);
-  // float gamm = gamm_range(generator);
-  int termCount = 0, win = 0, loop_count = 0;
-  std::vector<std::string> dataSet = {"hello", "World"};
-  scanf("%d", &termCount);
+  // // float ep = ep_range(generator);
+  // // float gamm = gamm_range(generator);
+  int N = 0, input_1 = 0, input_2 = 0, input_3 = 0, update_1 = 0, update_2 = 0, update_3 = 0, update_4 = 0;
+  std::vector<std::string> dataSet;
 
-  while (termCount--) {
+  scanf("%d", &N);
+  scanf("%d", &input_1);
+  scanf("%d", &input_2);
+  scanf("%d", &input_3);
+  scanf("%d", &update_1);
+  scanf("%d", &update_2);
+  scanf("%d", &update_3);
+  scanf("%d", &update_4);
 
-    // Try with concrete values as of now.
-    // We can try with Foralls later.
-    CountMinSketch c(0.01, 0.1);
-    // float ep = ep_range(generator);
-    // float gamm = gamm_range(generator);
-    // CountMinSketch c(ep, gamm);
-
-    c.update(dataSet[0].c_str(), 1); // Update number Could be foralls.
-    c.update(dataRange(generator), 2);
-    c.update(dataSet[0].c_str(), 1);
-
-    auto ret = c.estimate(dataSet[0].c_str());
-    if (ret != 2) {
-      // klee_dump_kquery_state();
-      win++;
-    }
-    loop_count++;
+  while (N--)
+  {
+    std::string temp = "";
+    std::getline(std::cin, temp);
+    dataSet.emplace_back(temp);
   }
 
-  auto pwin = (double)win / loop_count;
-  std::cout << "Prob Assert : " << pwin << "\n";
+  // Try with concrete values as of now.
+  // We can try with Foralls later.
+  CountMinSketch c(0.01, 0.1);
+  // float ep = ep_range(generator);
+  // float gamm = gamm_range(generator);
+  // CountMinSketch c(ep, gamm);
+
+  // Update number Could be foralls.
+  c.update(dataSet[input_1].c_str(), update_1);
+
+  c.update(dataSet[input_2].c_str(), update_2);
+  c.update(dataSet[input_3].c_str(), update_4);
+
+  // Update the count for the same element again.
+  c.update(dataSet[input_1].c_str(), update_3);
+
+  // Ask for the number of counts seen for item-1
+  auto ret = c.estimate(dataSet[input_1].c_str());
+
+  if (ret != update_1 + update_3)
+  {
+    // klee_dump_kquery_state();
+    std::cout << 1 << "\n";
+  }
+  else
+  {
+    std::cout << 0 << "\n";
+  }
+
   return 0;
 }

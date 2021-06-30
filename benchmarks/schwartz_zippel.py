@@ -25,8 +25,8 @@ ACC Probability over inputs [ Output != 0 ] >= n / subset_max
 '''
 
 
-random_runs = 1
-random_input_samples = 500
+runs_per_input = 1
+num_input_samples = 500
 
 
 def inputParams(config, inputNum):
@@ -82,7 +82,7 @@ if __name__ == '__main__':
 
     configList contains the ForAlls.
     """
-    AxProf.checkProperties(configList, random_runs, random_input_samples, AxProf.distinctIntegerGenerator,
+    AxProf.checkProperties(configList, runs_per_input, num_input_samples, AxProf.distinctIntegerGenerator,
                            inputParams, runner, spec=spec)
     endTime = time.time()  # Stop measuring time
     print(f'Total time required for checking : {endTime - startTime} seconds.')

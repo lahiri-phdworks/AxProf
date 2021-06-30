@@ -4,6 +4,7 @@ import random
 import AxProf
 import random
 import time
+from math import comb
 from scipy.stats import bernoulli
 from IPython.lib.pretty import pprint
 
@@ -21,8 +22,8 @@ ACC Probability over runs [ Output == 1 ] >= 0.5
 '''
 
 
-random_runs = 1
-random_input_samples = 10
+runs_per_input = 100
+num_input_samples = 10
 
 
 def inputParams(config, inputNum):
@@ -35,7 +36,7 @@ def runner(inputFileName, config):
 
     data = []
     for line in open(inputFileName, "r"):
-        data.append(line[:-1])
+        data.append(line[: -1])
 
     # Send a randomly intialized array of size "n".
     arr = [elem + 1 for elem in range(config['n'])]
@@ -81,12 +82,12 @@ if __name__ == '__main__':
 
     """
     For different ForAll Arrays and given "n" & "k" from the configuration list.
-    We run AxProf in which k is randonly sampled. 
+    We run AxProf in which k is randonly sampled.
     We need to send an array where j is sampled from [0, 1]
 
     configList contains the ForAlls.
     """
-    AxProf.checkProperties(configList, random_runs, random_input_samples, AxProf.distinctIntegerGenerator,
+    AxProf.checkProperties(configList, runs_per_input, num_input_samples, AxProf.distinctIntegerGenerator,
                            inputParams, runner, spec=spec)
     endTime = time.time()  # Stop measuring time
     print(f'Total time required for checking : {endTime - startTime} seconds.')

@@ -1,0 +1,60 @@
+Using existing 'outputs' directory for time and memory data
+Generated following checker functions from spec:
+from __main__ import *
+
+def perConfigFunc(Config, Runs, Inputs, Output):
+  Output = Output['acc']
+  t0 = 0
+  for t1 in range(Inputs):
+    t0 += 1 if ((Output[t1])==1) else 0
+  t2 = (AxProf.binomialTest(t0,Inputs,0.5,alternative='less')>=0.05)
+  if not t2:
+    print('Checker detected a possible error')
+  return t2
+
+def inpAgg(agg,run,output):
+  if agg==None:
+    agg = {'acc':[], 'time':0, 'space':0}
+  agg['acc'].append(output['acc'])
+  agg['time'] = (agg['time']*run + output['time'])/(run+1)
+  agg['space'] = (agg['space']*run + output['space'])/(run+1)
+  return agg
+
+def cfgAgg(agg,input,inpAgg):
+  if agg==None:
+    agg = {'acc':[], 'time':0, 'space':0}
+  agg['acc'] += inpAgg['acc']
+  agg['time'] = (agg['time']*input + inpAgg['time'])/(input+1)
+  agg['space'] = (agg['space']*input + inpAgg['space'])/(input+1)
+  return agg
+
+def finalFunc(paramNames, outputs, runs, inputs):
+  times = {k:v['time'] for k, v in outputs.items()}
+  AxProf.dumpObtainedData(times,'outputs/countminsketch-timeData.txt',paramNames,dataName='time')
+  spaces = {k:v['space'] for k, v in outputs.items()}
+  AxProf.dumpObtainedData(spaces,'outputs/countminsketch-spaceData.txt',paramNames,dataName='space')
+
+<function inpAgg at 0x7fb4949a0dc0> <function cfgAgg at 0x7fb4949a0e50> None None <function perConfigFunc at 0x7fb4949a0ca0> <function finalFunc at 0x7fb4949a0ee0>
+Using user-provided no. of runs: 1
+Using user-provided no. of inputs: 1
+Running test program for configuration {'n': 3}
+Random Input 1
+.{'acc': 1, 'time': 0.0180208683013916, 'space': 0}
+
+Running test program for configuration {'n': 4}
+Random Input 1
+.{'acc': 1, 'time': 0.017090559005737305, 'space': 0}
+
+Running test program for configuration {'n': 5}
+Random Input 1
+.{'acc': 1, 'time': 0.017117977142333984, 'space': 0}
+
+Running test program for configuration {'n': 6}
+Random Input 1
+.{'acc': 1, 'time': 0.016193866729736328, 'space': 0}
+
+Running test program for configuration {'n': 7}
+Random Input 1
+.{'acc': 1, 'time': 0.016959667205810547, 'space': 0}
+
+Total time required for checking : 0.2775881290435791 seconds.

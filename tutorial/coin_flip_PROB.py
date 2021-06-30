@@ -40,8 +40,8 @@ ACC Probability over inputs [ Output < 0.4 * coins * y ] <= 0.45
 '''
 
 
-random_runs = 100
-random_input_samples = 1
+runs_per_input = 100
+num_input_samples = 1
 
 
 # y -> ForAll Variable
@@ -153,7 +153,7 @@ if __name__ == '__main__':
 
     configList contains the ForAlls.
     """
-    AxProf.checkProperties(configList, random_runs, random_input_samples, AxProf.binaryVectorGenerator,
+    AxProf.checkProperties(configList, runs_per_input, num_input_samples, AxProf.binaryVectorGenerator,
                            inputParams, runner, spec=spec)
     endTime = time.time()  # Stop measuring time
     print(f'Total time required for checking : {endTime - startTime} seconds.')

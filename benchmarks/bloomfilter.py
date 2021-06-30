@@ -3,34 +3,33 @@ import os
 import random
 import AxProf
 import random
+import string
 import time
 from scipy.stats import bernoulli
 from subprocess import run, CalledProcessError
+from IPython.lib.pretty import pprint
 
-# choice : ForAll Variable.
-# door_switch : ForAll Variable
-configList = {'choice': [1, 2, 3],
-              'door_switch': [0, 1], 'car_door': [1]}
+# n : ForAll Variable. Entries in bloomfilter
+configList = {'n': [3, 4, 5, 6, 7]}
 
-# Axprof Specification for Monty Hall
+# Axprof Specification for Bloom Filter
 spec = '''
 Input list of real;
 Output real;
-prob real;
-y real;
-TIME coins;
-ACC Expectation over runs [Output] == coins * prob * y
+n real;
+ACC Probability over inputs [ Output == 1 ] >= 0.5
 '''
 
 
-random_runs = 1
-random_input_samples = 1
+runs_per_input = 1
+num_input_samples = 1
+string_data_set = []
 
 
-def execute(executable, inFile, outfile, errFile):
+def execute(inFile, outfile, errFile):
     try:
         output = run(
-            f"bin/{executable} < {inFile} > {outfile} 2> {errFile}",
+            f"bin/bloomfilter < {inFile} > {outfile} 2> {errFile}",
             shell=True,
             capture_output=False,
             text=True,
@@ -38,12 +37,12 @@ def execute(executable, inFile, outfile, errFile):
     except CalledProcessError as err:
         print(f"Execute Error : {err}")
     else:
-        pass
-    return output.returncode
+        output = run(["cat", f"{outfile}"], capture_output=True)
+        return int(output.stdout)
 
 
 def inputParams(config, inputNum):
-    return [config['coins'], 1, 3]
+    return [0.01, 0.99]
 
 
 def runner(inputFileName, config):
@@ -53,18 +52,38 @@ def runner(inputFileName, config):
     for line in open(inputFileName, "r"):
         data.append(line[:-1])
 
-    output = bloom_filter_runner(config['n'], data)
+    # data[0] is the false positive rate
+    output = 0
+    output = bloom_filter_runner(config['n'], float(data[0]))
 
     endTime = time.time()
-    result = {'acc': output, 'time': (endTime - startTime)}
+    result = {'acc': output, 'time': (endTime - startTime), 'space': 0}
+    pprint(result)
     return result
 
 
-def bloom_filter_runner():
-    pass
+def bloom_filter_runner(entries, error):
+    with open(f"tests/bloomfilter_{entries}.txt", mode="w") as fileptr:
+        fileptr.write(f"{entries}\n")
+        fileptr.write(f"{entries}\n")
+        fileptr.write(f"{error}\n")
+        fileptr.write(f"{random.randint(0, entries - 1)}\n")
+        fileptr.write(f"{random.randint(0, entries - 1)}\n")
+        for strings in string_data_set[entries - 3]:
+            fileptr.write(f"{strings}\n")
+    return execute(f"tests/bloomfilter_{entries}.txt", f"tests/output_{entries}.txt", f"tests/error_{entries}.txt")
 
 
 if __name__ == '__main__':
+    # Generate a set of strings that are to be added to the bloomfilter.
+    for entries in configList['n']:
+        string_data = []
+        for j in range(entries):
+            strings = ''.join(random.SystemRandom().choice(
+                string.ascii_uppercase + string.digits) for _ in range(10))
+            string_data.append(strings)
+        string_data_set.append(string_data)
+
     startTime = time.time()  # Start measuring time
 
     """
@@ -74,7 +93,7 @@ if __name__ == '__main__':
 
     configList contains the ForAlls.
     """
-    AxProf.checkProperties(configList, random_runs, random_input_samples, AxProf.distinctIntegerGenerator,
+    AxProf.checkProperties(configList, runs_per_input, num_input_samples, AxProf.singleUniformGenerator,
                            inputParams, runner, spec=spec)
     endTime = time.time()  # Stop measuring time
     print(f'Total time required for checking : {endTime - startTime} seconds.')
