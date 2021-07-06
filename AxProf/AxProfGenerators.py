@@ -89,3 +89,8 @@ def flattenedMatrixGenerator(l, m):
 # used when script provides external input
 def dummyGenerator(x):
     return [x]
+
+
+# J-Sampler for reservoir sampling
+def reservoir_sampler(x):
+    return [x]

@@ -9,7 +9,7 @@ from scipy.stats import bernoulli
 from IPython.lib.pretty import pprint
 
 # n : Size of the Square Matrix ForAll Variable.
-configList = {'forall_setting': range(10), 'n': [2, 3, 4, 5, 6]}
+configList = {'forall_setting': range(100), 'n': [2, 3, 4, 5, 6]}
 
 # Axprof Specification for Frievald's algorithm
 spec = '''
@@ -20,7 +20,7 @@ ACC Probability over inputs [ Output == 1 ] >= 0.5
 '''
 
 runs_per_input = 1
-num_input_samples = 10
+num_input_samples = 100
 
 forAllInputArrays = []
 
@@ -89,11 +89,11 @@ if __name__ == '__main__':
         single_forall_input = []
         for i in configList['n']:
             forAllObj = {}
-            A = [[random.randint(1, 10000) for k in range(i)]
+            A = [[random.randint(0, 255) for k in range(i)]
                  for m in range(i)]
-            B = [[random.randint(1, 10000) for k in range(i)]
+            B = [[random.randint(0, 255) for k in range(i)]
                  for m in range(i)]
-            C = [[random.randint(1, 10000) for k in range(i)]
+            C = [[random.randint(0, 255) for k in range(i)]
                  for m in range(i)]
             single_forall_input.append([A, B, C])
         for_all_inputs.append(single_forall_input)

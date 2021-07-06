@@ -15,10 +15,11 @@ configList = {'n': [2, 3, 4, 5, 6, 7, 8, 9]}
 # Axprof Specification for Monty Hall
 spec = '''
 Input list of real;
-Output real;
-n real;
+Output list of real;
+min real;
+ressize real;
 TIME n;
-ACC Probability over runs [ Output == 1 ] >= 0.5
+ACC forall i in Input : Probability over runs [ i in Output ] == min(ressize/n, 1)
 '''
 
 
@@ -67,14 +68,7 @@ def reservoir_sampling_runner(arr, n, k):
             sample[j] = arr[i]
         i = i + 1
 
-    ret = 0
-    i = 0
-    while i < k:
-        if arr[0] == sample[i]:
-            ret = 1
-        i = i + 1
-
-    return ret
+    return sample
 
 
 if __name__ == '__main__':

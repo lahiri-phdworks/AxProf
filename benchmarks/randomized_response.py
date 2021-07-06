@@ -14,7 +14,7 @@ configList = {'truth': [0, 1],
 
 # Axprof Specification for Monty Hall
 spec = '''
-Input list of real;
+Input real;
 Output real;
 truth real;
 first_flip real;
