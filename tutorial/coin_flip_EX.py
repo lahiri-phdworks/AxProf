@@ -79,7 +79,7 @@ def runner(inputFileName, config):
     The runner is run "n" times where "n" is len(configList). 
     Each time with the next value in the configList.
     Returns:
-        [Sum]: [NUmber of HEADS in the coin flip experiment]
+        [Sum]: [Number of HEADS in the coin flip experiment]
     """
     coinSum = flipCoins(
         config['coins'], config['prob'], config['y'], [int(elem) for elem in data])  # flipCoins(config['coins']) Same Value as expected.

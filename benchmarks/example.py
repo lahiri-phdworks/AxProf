@@ -9,22 +9,22 @@ from scipy.stats import bernoulli
 from IPython.lib.pretty import pprint
 
 configList = {
-    'a': [1000]
+    'a': range(1000)
 }
 
 spec = '''
 Input real;
 Output real;
 TIME a;
-ACC Expectation over runs [ Output ] > 5 * a
+ACC forall i in Input : Probability over runs [ Output < 2.5 * a ] < 0.5
 '''
 
-runs_per_input = 200
-num_input_samples = 500
+runs_per_input = 400  # 200
+num_input_samples = 1  # 1
 
 
 def inputParams(config, inputNum):
-    return [1, 1, config['a']]
+    return [config['a']]
 
 
 def runner(inputFileName, config):
@@ -36,7 +36,9 @@ def runner(inputFileName, config):
 
     output = getSum(int(data[0]))
     endTime = time.time()
-    result = {'acc': output, 'time': (endTime - startTime), 'space': 0}
+    result = {'acc': output, 'time': (endTime - startTime), 'space': 0, 'summary': {
+        'sum': output, 'a': int(data[0])
+    }}
 
     pprint(result)
     return result
@@ -63,7 +65,7 @@ def getSum(a):
 if __name__ == '__main__':
     startTime = time.time()  # Start measuring time
 
-    AxProf.checkProperties(configList, runs_per_input, num_input_samples, AxProf.distinctIntegerGenerator,
+    AxProf.checkProperties(configList, runs_per_input, num_input_samples, AxProf.dummyGenerator,
                            inputParams, runner, spec=spec)
 
     endTime = time.time()  # Stop measuring time

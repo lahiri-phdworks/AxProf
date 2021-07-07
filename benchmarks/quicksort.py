@@ -23,9 +23,10 @@ spec = '''
 Input list of real;
 Output real;
 n real;
-math.log real;
+math.factorial real;
+SPACE n;
 TIME n * math.log(n, 2);
-ACC Expectation over runs [ Output ] > 1.5 * n * math.log(n, 2)
+ACC forall i in Input : Probability over runs [ Output > (n * (n - 1) / 2) ] == 0
 '''
 
 runs_per_input = 100
@@ -38,7 +39,7 @@ compare_count = 0
 
 
 def inputParams(config, inputNum):
-    return [config['n'], 0, config['n'] - 1]
+    return [config['n']]
 
 
 def runner(inputFileName, config):
@@ -139,7 +140,7 @@ if __name__ == '__main__':
 
     configList contains the ForAlls.
     """
-    AxProf.checkProperties(configList, runs_per_input, num_input_samples, AxProf.distinctIntegerGenerator,
+    AxProf.checkProperties(configList, runs_per_input, num_input_samples, AxProf.dummyGenerator,
                            inputParams, runner, spec=spec)
     endTime = time.time()  # Stop measuring time
     print(f'Total time required for checking : {endTime - startTime} seconds.')
