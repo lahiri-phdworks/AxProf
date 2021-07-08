@@ -94,3 +94,12 @@ def dummyGenerator(x):
 # J-Sampler for reservoir sampling
 def reservoir_sampler(x):
     return [x]
+
+
+def matGenerator(nums, _min, _max, N=3, seed=None):
+    matrices = []
+    for _ in range(nums):
+        matrices.append([[random.randint(_min, _max) for k in range(N)]
+                        for m in range(N)])
+
+    return matrices

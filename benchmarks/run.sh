@@ -21,7 +21,7 @@ make -j 2
 cd ../
 
 echo "  ---- Running Binary : ${RUNNER} ----  "
-for files in tests/${RUNNER}_*.txt; 
+for files in tests/${RUNNER}.txt; 
 do
     bin/${RUNNER} < $files
 done 
