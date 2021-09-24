@@ -1,4 +1,5 @@
 outputs/
+output/
 bin/
 tests/*.txt
 sorting.py
