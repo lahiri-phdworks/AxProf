@@ -9,7 +9,7 @@ from scipy.stats import bernoulli
 from IPython.lib.pretty import pprint
 
 configList = {'k': [5],
-              'a': [1000]
+              'a': [1000000000]
               }
 
 spec = '''
@@ -19,12 +19,12 @@ TIME k;
 ACC Probability over inputs [ Output > 2.5 * a && Output <= 5 * a ] > 0.95
 '''
 
-runs_per_input = 100  # 200
-num_input_samples = 50  # 1
+runs_per_input = 1  # 200
+num_input_samples = None  # 1
 
 
 def inputParams(config, inputNum):
-    return [1, 1, config['a']]
+    return 1, 1, config['a']
 
 
 def runner(inputFileName, config):
@@ -66,7 +66,7 @@ def getSum(a):
 if __name__ == '__main__':
     startTime = time.time()  # Start measuring time
 
-    AxProf.checkProperties(configList, runs_per_input, num_input_samples, AxProf.dummyGenerator,
+    AxProf.checkProperties(configList, runs_per_input, num_input_samples, AxProf.distinctIntegerGenerator,
                            inputParams, runner, spec=spec)
 
     endTime = time.time()  # Stop measuring time

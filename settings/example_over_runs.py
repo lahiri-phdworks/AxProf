@@ -9,7 +9,7 @@ from scipy.stats import bernoulli
 from IPython.lib.pretty import pprint
 
 configList = {'k': [5],
-              'a': [1000]
+              'a': [1000000000]
               }
 
 spec = '''
