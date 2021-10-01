@@ -1,89 +1,46 @@
-import sys
-import os
-import random
 import AxProf
+import subprocess
 import random
-import time
-from math import comb
-from scipy.stats import bernoulli
-from IPython.lib.pretty import pprint
+import sys
 
-# n : ForAll Variable.
-# k : ForAll Variable
-configList = {'n': [2, 3, 4, 5, 6, 7, 8, 9]}
+configlist = {'ressize': [i for i in range(50, 550, 10)],
+              'datasize': [i for i in range(50, 550, 10)]}
 
-# Axprof Specification for Monty Hall
+
+def igparams(Cfg, inpNum): return [Cfg['datasize'], 1, 0]
+
+
+ofname = 'resoutput.txt'
+pfname = 'perfstats.txt'
+
 spec = '''
 Input list of real;
 Output list of real;
 min real;
-ressize real;
-TIME n;
-ACC forall i in Input : Probability over runs [ i in Output ] == min(ressize/n, 1)
+TIME datasize;
+SPACE ressize;
+ACC forall i in Input : Probability over runs [ i in Output ] == min((ressize - 1)/datasize, 1)
 '''
 
 
-runs_per_input = 100
-num_input_samples = 10
+def runner(ifname, config):
+    pipes = subprocess.run(args=['./bin/sample', '-k', str(config['ressize']),
+                           '-d', str(random.randint(0, 2**31-1)), ifname], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    out, err = pipes.stdout, pipes.stderr
+    out = out.decode("utf-8")
+    err = err.decode("utf-8")
+    err = err.split()
+    err = [random.random(), random.random()]
+    sample = set()
+    out = out.split('\n')[:-1]
+    for line in out:
+        sample.add(int(line))
+    return {'time': float(err[0]), 'space': float(err[1]), 'acc': sample}
 
 
-def inputParams(config, inputNum):
-    # "k" is sampled from 1 to "n" value, k <= n
-    return [1, 1, config['n']]
-
-
-def runner(inputFileName, config):
-    startTime = time.time()
-
-    data = []
-    for line in open(inputFileName, "r"):
-        data.append(line[: -1])
-
-    # Send a randomly intialized array of size "n".
-    arr = [elem + 1 for elem in range(config['n'])]
-    output = reservoir_sampling_runner(arr, config['n'], int(data[0]))
-
-    endTime = time.time()
-    result = {'acc': output, 'time': (endTime - startTime), 'space': 0, 'random input': {
-        'forall_n': config['n'], 'forall_k':  int(data[0]), 'input_arr': arr
-    }}
-    pprint(result)
-    return result
-
-
-def reservoir_sampling_runner(arr, n, k):
-    sample = [0] * k
-
-    i = 0
-    while i < k:
-        sample[i] = arr[i]
-        i = i + 1
-
-    i = k
-    while i < n:
-        # TODO : Can we get this from AxProf
-        # j is a make_pse_symbolic()
-        j = random.randint(0, i)
-        if j < k:
-            sample[j] = arr[i]
-        i = i + 1
-
-    return sample
-
-
-if __name__ == '__main__':
-    startTime = time.time()  # Start measuring time
-
-    """
-    For different ForAll Arrays and given "n" & "k" from the configuration list.
-    We run AxProf in which k is randonly sampled.
-    We need to send an array where j is sampled from [0, 1]
-
-    configList contains the ForAlls.
-    """
-    AxProf.checkProperties(configList, runs_per_input, num_input_samples, AxProf.distinctIntegerGenerator,
-                           inputParams, runner, spec=spec)
-    endTime = time.time()  # Stop measuring time
-    print(f'Total time required for checking : {endTime - startTime} seconds.')
-
-# ==============================================================================
+if __name__ == "__main__":
+    random.seed()
+    subprocess.run(['date'])
+    AxProf.checkProperties(configlist, 300, 1,
+                           AxProf.linearGenerator, igparams, runner, spec=spec)
+    subprocess.run(['date'])

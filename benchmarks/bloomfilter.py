@@ -15,9 +15,9 @@ configList = {'entries': [3, 4, 5, 6, 7]}
 # Axprof Specification for Bloom Filter
 spec = '''
 Input list of real;
-Output real;
-n real;
-ACC Probability over inputs [ Output == 1 ] >= 0.5
+Output list of real;
+p real;
+ACC Probability over i in excluded(Config, Input) [ i in Output ] < p
 '''
 
 

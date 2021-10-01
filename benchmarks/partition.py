@@ -1,82 +1,63 @@
-import sys
 import os
+import sys
+import time
 import random
 import AxProf
-import random
-import time
+import subprocess
 from scipy.stats import bernoulli
 from IPython.lib.pretty import pprint
 
 # n : Array Size ForAll Variable.
-configList = {'n': [2, 3, 4, 5, 6, 7, 8, 9, 10], 'forall_setting': range(150)}
+configList = {'n': [100, 150, 200]}
+written_once = 0
 
 # Axprof Specification for QuickSort Partitioning Algorithm.
+# Pr() bound : Probability over runs [ Output == n/2 ] > 0.99 [Error]
 spec = '''
-Input list of real;
+Input real;
 Output real;
 n real;
 TIME n;
-ACC Expectation over inputs [ Output ] >= n/2
+ACC Expectation over runs [ Output ] > n/2 
 '''
 
-runs_per_input = 1
-num_input_samples = 10
-partition_arrays = []
+runs_per_input = 100
+num_input_samples = 1
 
 
 def inputParams(config, inputNum):
-    return [1, 0, config['n'] - 1]
+    return [config['n'], -10000, 10000]
 
 
 def runner(inputFileName, config):
     startTime = time.time()
-
+    global written_once
     data = []
     for line in open(inputFileName, "r"):
-        data.append(line[:-1])
+        data.append(int(line.strip()))
 
-    output = partition_runner(
-        partition_arrays[config['n'] - 2][config['forall_setting']], int(data[0]))
+    if written_once == 0:
+        with open(inputFileName, "w") as fileptr:
+            written_once = 1
+            fileptr.write(f"{config['n']}\n")
+            for lines in data:
+                fileptr.write(f"{lines}\n")
 
+    # COMMENT : Do we add an assume(distinct) assert here for AxProf?
+    time.sleep(0.25)
+    pipes = subprocess.run(f"./bin/partition < {inputFileName}", shell=True, stdout=subprocess.PIPE,
+                           stderr=subprocess.PIPE)
+    out, err = pipes.stdout, pipes.stderr
+    out = out.decode("utf-8").strip()
+    err = err.decode("utf-8").strip()
     endTime = time.time()
-    result = {'acc': output, 'time': (endTime - startTime), 'space': 0, 'random input': {
-        'pivot_index': int(data[0]), 'forall_input_index': config['forall_setting'], 'forall_n': config['n'], 'forall_array': partition_arrays[config['n'] - 2][config['forall_setting']]
-    }}
+    print(f"{err}")
+    result = {'acc': int(out), 'time': (endTime - startTime), 'space': 0}
     pprint(result)
     return result
 
 
-def partition_runner(arr, index):
-    left_count = 0
-    right_count = 0
-
-    pivot = arr[index]
-
-    for j in arr:
-        if j < pivot:
-            left_count += 1
-        else:
-            right_count += 1
-
-    if left_count < (right_count - 1):
-        outcome = (right_count - 1)
-    else:
-        outcome = left_count
-
-    # We need E[outcome]
-    return outcome
-
-
 if __name__ == '__main__':
-    for sizes in configList['n']:
-        forall_arrays = []
-        for index in configList['forall_setting']:
-            forall_inputs = []
-            for i in range(sizes):
-                forall_inputs.append(random.randint(-15000, 15000))
-            forall_arrays.append(forall_inputs)
-        partition_arrays.append(forall_arrays)
-
     startTime = time.time()  # Start measuring time
 
     """
@@ -86,7 +67,7 @@ if __name__ == '__main__':
 
     configList contains the ForAlls.
     """
-    AxProf.checkProperties(configList, runs_per_input, num_input_samples, AxProf.distinctIntegerGenerator,
+    AxProf.checkProperties(configList, runs_per_input, num_input_samples, AxProf.arrayGenerator,
                            inputParams, runner, spec=spec)
     endTime = time.time()  # Stop measuring time
     print(f'Total time required for checking : {endTime - startTime} seconds.')

@@ -1,118 +1,73 @@
-import sys
-import os
-import random
 import AxProf
-import random
-import string
-import time
-from scipy.stats import bernoulli
-from subprocess import run, CalledProcessError
-from IPython.lib.pretty import pprint
+import numpy as np
+import subprocess
+from collections import Counter
+from numpy import log
+import sys
 
-# n : ForAll Variable. Entries in bloomfilter
-configList = {'entries': [3, 4, 5, 6, 7]}
+sys.path.append('../AxProf')
 
-# Axprof Specification for Bloom Filter
+configlist = {'logdelta': [-1, -2, -3],
+              'epsilon': [0.05, 0.1, 0.2],
+              'datasize': range(10000, 40000, 10000),
+              'zipf': [1.1, 1.5, 2]}
+
+
+def igparams(Cfg, inpNum): return [Cfg['datasize'], Cfg['zipf']]
+
+
+commstr = """bin/countmin {} {} {} {}"""
+
 spec = '''
 Input list of real;
-Output real;
-n real;
-ACC Probability over inputs [ Output == 1 ] >= 0.5
+Output map from real to real;
+count real;
+TIME logdelta*datasize;
+SPACE logdelta/(epsilon^2);
+ACC Probability over i in uniques(Input) [ abs(count(i,Input) - Output[i]) > epsilon*|Input| ] < 1 - (10^logdelta)
 '''
 
 
-runs_per_input = 10
-num_input_samples = 20
-forall_strings = []
+def count(i, Input):
+    counts = Counter(Input)
+    return counts[i]
 
 
-def execute(inFile, outfile, errFile):
-    try:
-        output = run(
-            f"bin/bloomfilter < {inFile} > {outfile} 2> {errFile}",
-            shell=True,
-            capture_output=False,
-            text=True,
-        )
-    except CalledProcessError as err:
-        print(f"Execute Error : {err}")
-    else:
-        output = run(["cat", f"{outfile}"], capture_output=True)
-        return int(output.stdout)
+def runner(ifname, config):
+    query_str = commstr.format(config['datasize'], ifname,
+                               config['epsilon'], 10**config['logdelta'])
+    pipes = subprocess.run(query_str, shell=True, stdout=subprocess.PIPE,
+                           stderr=subprocess.PIPE)
+    out, err = pipes.stdout, pipes.stderr
+    out = out.decode("utf-8").split('\n')
+    err = err.decode("utf-8")
+    output = {}
+    time = float(out[1])
+    output['time'] = time
+    space = float(out[2])
+    output['space'] = space
+    output['acc'] = {}
+    for line in out[3:-1]:
+        _id, real, count = line.split(' ')
+        output['acc'][int(_id)] = int(count)
+    return output
 
 
-def inputParams(config, inputNum):
-    return [2, 0, config['entries'] - 1]
+# These functions are needed for input feature selection
+def error(inputData, output):
+    counts = Counter(inputData)
+    errorSize = 0
+    for item in output.keys():
+        errorSize += output[item] - counts[item]
+    return errorSize
 
 
-def runner(inputFileName, config):
-    startTime = time.time()
-
-    data = []
-    for line in open(inputFileName, "r"):
-        data.append(line[:-1])
-
-    # data[0] is the false positive rate
-    output = 0
-
-    output = countminsketch_runner(
-        config['entries'], config['error'], int(data[0]), int(data[1]), config['forall_settings'])
-
-    endTime = time.time()
-    result = {'acc': output, 'time': (endTime - startTime), 'space': 0, 'random input': {
-        'error': config['error'], 'entries': config['entries'], 'add_index': int(data[0]), 'seach_index': int(data[1]), 'forall_setting': config['forall_settings']
-    }}
-    pprint(result)
-    return result
-
-
-def countminsketch_runner(entries, error):
-    with open(f"tests/countminsketch_{entries}.txt", mode="w") as fileptr:
-        fileptr.write(f"{entries}\n")
-        fileptr.write(f"{random.randint(0, entries - 1)}\n")
-        fileptr.write(f"{random.randint(0, entries - 1)}\n")
-        fileptr.write(f"{random.randint(0, entries - 1)}\n")
-        fileptr.write(f"{random.randint(0, 100)}\n")
-        fileptr.write(f"{random.randint(0, 100)}\n")
-        fileptr.write(f"{random.randint(0, 100)}\n")
-        fileptr.write(f"{random.randint(0, 100)}\n")
-        for strings in string_data_set[entries - 3]:
-            fileptr.write(f"{strings}\n")
-    return execute(f"tests/countminsketch_{entries}.txt", f"tests/output_{entries}.txt", f"tests/error_{entries}.txt")
-
-
-if __name__ == '__main__':
-    # Generate a set of strings that are to be added to the bloomfilter.
-    errors = []
-    for i in range(25):
-        errors.append(random.uniform(0.01, 0.999))
-
-    configList['error'] = errors
-    configList['forall_settings'] = range(10)
-
-    for k in configList['forall_settings']:
-        string_data_set = []
-        for entries in configList['entries']:
-            string_data = []
-            for j in range(entries):
-                strings = ''.join(random.SystemRandom().choice(
-                    string.ascii_uppercase + string.digits) for _ in range(10))
-                string_data.append(strings)
-            string_data_set.append(string_data)
-        forall_strings.append(string_data_set)
-
-    startTime = time.time()  # Start measuring time
-
-    """
-    We specify that we need to run each coin-flipping session, 1000 times.
-    The number of coins flipped in each session is equal to the numbers
-    listed in the configList defined above. 
-
-    configList contains the ForAlls.
-    """
-    AxProf.checkProperties(configList, runs_per_input, num_input_samples, AxProf.distinctIntegerGenerator,
-                           inputParams, runner, spec=spec)
-    endTime = time.time()  # Stop measuring time
-    print(f'Total time required for checking : {endTime - startTime} seconds.')
-
-# ==============================================================================
+if __name__ == "__main__":
+    subprocess.run(['date'])
+    AxProf.selectInputFeatures(configlist, AxProf.zipfGenerator,
+                               igparams, ['datasize', 'zipf'], error,
+                               runner)
+    AxProf.checkProperties(configlist, None, 1, AxProf.zipfGenerator,
+                           igparams, runner, spec=spec)
+    subprocess.run(['date'])
+    subprocess.run(['rm', '-f', 'gmon.out'])

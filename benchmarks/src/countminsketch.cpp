@@ -6,6 +6,7 @@
 #include <limits>
 #include <prob_hash_int.h>
 #include <random>
+
 using namespace std;
 
 /**
@@ -26,10 +27,9 @@ unsigned int my_hash(struct prob_hash *prob_hash, int key, unsigned int max)
   // If the key is not in the map, get a random element and rehash
   if (found == prob_hash->map.end())
   {
-    std::default_random_engine generator;
-    std::uniform_int_distribution<int> range_dist(0, (int)max);
-    unsigned int x = range_dist(generator);
-    // make_pse_symbolic(&x, sizeof(x), "x_sym", 0, (int)max);
+    unsigned int x;
+    make_pse_symbolic(&x, sizeof(x), "x_sym", (unsigned int)0, (unsigned int)max);
+    printf("max = %d\n", max);
     prob_hash->map[key] = x;
     return x;
   }
@@ -102,7 +102,10 @@ CountMinSketch::~CountMinSketch()
 
 // CountMinSketch totalcount returns the
 // total count of all items in the sketch
-unsigned int CountMinSketch::totalcount() { return total; }
+unsigned int CountMinSketch::totalcount()
+{
+  return total;
+}
 
 // countMinSketch update item count (int)
 void CountMinSketch::update(int item, int c)
@@ -130,7 +133,7 @@ unsigned int CountMinSketch::estimate(int item)
   unsigned int hashval = 0;
   for (unsigned int j = 0; j < d; j++)
   {
-    // hashval = ((long)hashes[j][0]*item+hashes[j][1])%LONG_PRIME%w;
+    //    hashval = ((long)hashes[j][0]*item+hashes[j][1])%LONG_PRIME%w;
     hashval = my_hash(&hash_fns[j], item, w - 1);
     minval = MIN(minval, C[j][hashval]);
   }
@@ -166,61 +169,30 @@ unsigned int CountMinSketch::hashstr(const char *str)
 
 int main()
 {
+  int n = 5;
+  float epsilon = 0.5;
+  float gamma = 0.25;
+  CountMinSketch c(epsilon, gamma);
 
-  // std::default_random_engine generator;
-  // std::uniform_int_distribution<int> dataRange(INT32_MIN, INT32_MAX);
-  // std::uniform_real_distribution<float> ep_range(0.01, 1);
-  // std::uniform_real_distribution<float> gamm_range(0, 1);
-
-  // // float ep = ep_range(generator);
-  // // float gamm = gamm_range(generator);
-  int N = 0, input_1 = 0, input_2 = 0, input_3 = 0, update_1 = 0, update_2 = 0, update_3 = 0, update_4 = 0;
-  std::vector<std::string> dataSet;
-
-  scanf("%d", &N);
-  scanf("%d", &input_1);
-  scanf("%d", &input_2);
-  scanf("%d", &input_3);
-  scanf("%d", &update_1);
-  scanf("%d", &update_2);
-  scanf("%d", &update_3);
-  scanf("%d", &update_4);
-
-  while (N--)
+  int elems[n];
+  for (int i = 0; i < n; i++)
   {
-    std::string temp = "";
-    std::getline(std::cin, temp);
-    dataSet.emplace_back(temp);
+    int temp;
+    klee_make_symbolic(&temp, sizeof(temp), "a_sym");
+    for (int j = 0; j < i; j++)
+    {
+      klee_assume(temp != elems[j]);
+    }
+    elems[i] = temp;
   }
-
-  // Try with concrete values as of now.
-  // We can try with Foralls later.
-  CountMinSketch c(0.01, 0.1);
-  // float ep = ep_range(generator);
-  // float gamm = gamm_range(generator);
-  // CountMinSketch c(ep, gamm);
-
-  // Update number Could be foralls.
-  c.update(dataSet[input_1].c_str(), update_1);
-
-  c.update(dataSet[input_2].c_str(), update_2);
-  c.update(dataSet[input_3].c_str(), update_4);
-
-  // Update the count for the same element again.
-  c.update(dataSet[input_1].c_str(), update_3);
-
-  // Ask for the number of counts seen for item-1
-  auto ret = c.estimate(dataSet[input_1].c_str());
-
-  if (ret != update_1 + update_3)
+  for (int i = 0; i < n; i++)
   {
-    // klee_dump_kquery_state();
-    std::cout << 1 << "\n";
+    c.update(elems[i], 1);
   }
-  else
+  if (c.estimate(elems[0]) > 1 + epsilon * n)
   {
-    std::cout << 0 << "\n";
+    // Should happen with probability less than gamma
+    klee_dump_kquery_state();
   }
-
   return 0;
 }

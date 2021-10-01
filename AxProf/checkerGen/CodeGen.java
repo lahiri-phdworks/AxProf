@@ -601,7 +601,7 @@ public class CodeGen {
         specResult = resultTemp;
       }
       System.out.println("  if not " + specResult + ":");
-      System.out.println("    print('Checker detected a possible error') sys.exit(-1)");
+      System.out.println("    print('Checker detected a possible error')");
       System.out.println("  return " + specResult);
     }
     System.out.println("\ndef inpAgg(agg,run,output):\n  if agg==None:\n    agg = {'acc':[], 'time':0, 'space':0}");

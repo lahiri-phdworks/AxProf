@@ -14,8 +14,16 @@ def linearGenerator(length, a, b):
         output[i] = a * i + b
     return output
 
+# Generates uniformly chosen numbers within [_min,_max)
+
+
+def arrayGenerator(length, _min, _max, seed=None):
+    random.seed(seed)
+    return [random.randint(_min, _max) for _ in range(length)]
 
 # Generates uniformly chosen numbers within [_min,_max)
+
+
 def uniformGenerator(length, _min, _max, seed=None):
     random.seed(seed)
     return [random.uniform(_min, _max) for _ in range(length)]
